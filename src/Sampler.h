@@ -277,7 +277,7 @@ namespace klangwellen {
             fEvaluateLoop = loop;
         }
 
-        void set_loop_all() {
+        void set_looping() {
             fEvaluateLoop = true;
             fLoopIn       = 0;
             fLoopOut      = fBufferLength > 0 ? (fBufferLength - 1) : 0;

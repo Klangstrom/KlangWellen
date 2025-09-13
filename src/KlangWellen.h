@@ -24,6 +24,10 @@
 #include <limits>
 #include <algorithm>
 
+#ifndef M_PI
+#define M_PI 3.141592653589793238462643383279502884L
+#endif
+
 #ifndef PI
 #define PI M_PI
 #endif
