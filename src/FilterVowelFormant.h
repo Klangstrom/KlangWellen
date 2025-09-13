@@ -1,7 +1,7 @@
 /*
- * KlangWellen
+ * Klangwellen
  *
- * This file is part of the *KlangWellen* library (https://github.com/dennisppaul/klangwellen).
+ * This file is part of the *Klangwellen* library (https://github.com/dennisppaul/klangwellen).
  * Copyright (c) 2024 Dennis P Paul
  *
  * This library is free software: you can redistribute it and/or modify
@@ -31,7 +31,7 @@
 
 #include <stdint.h>
 
-#include "KlangWellen.h"
+#include "Klangwellen.h"
 #include "AudioSignal.h"
 
 namespace klangwellen {
@@ -55,7 +55,7 @@ namespace klangwellen {
         }
 
         void process(float*         signal_buffer,
-                     const uint32_t length = KlangWellen::DEFAULT_AUDIOBLOCK_SIZE) {
+                     const uint32_t length = Klangwellen::DEFAULT_AUDIOBLOCK_SIZE) {
             for (uint32_t i = 0; i < length; i++) {
                 signal_buffer[i] = process(signal_buffer[i]);
             }

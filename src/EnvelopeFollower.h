@@ -1,7 +1,7 @@
 /*
-* KlangWellen
+* Klangwellen
 *
-* This file is part of the *KlangWellen* library (https://github.com/dennisppaul/klangwellen).
+* This file is part of the *Klangwellen* library (https://github.com/dennisppaul/klangwellen).
 * Copyright (c) 2024 Dennis P Paul
 *
 * This library is free software: you can redistribute it and/or modify
@@ -32,14 +32,14 @@
 #include <iostream>
 #include <cmath>
 
-#include "KlangWellen.h"
+#include "Klangwellen.h"
 
 namespace klangwellen {
     class EnvelopeFollower {
     public:
         EnvelopeFollower(float attackTime  = 0.01,
                          float releaseTime = 0.1,
-                         float sampleRate  = KlangWellen::DEFAULT_SAMPLE_RATE)
+                         float sampleRate  = Klangwellen::DEFAULT_SAMPLE_RATE)
             : fAttackTime(attackTime), fReleaseTime(releaseTime), fSampleRate(sampleRate) {
             setAttackTime(attackTime);
             setReleaseTime(releaseTime);

@@ -1,7 +1,7 @@
 /*
- * KlangWellen
+ * Klangwellen
  *
- * This file is part of the *KlangWellen* library (https://github.com/dennisppaul/klangwellen).
+ * This file is part of the *Klangwellen* library (https://github.com/dennisppaul/klangwellen).
  * Copyright (c) 2024 Dennis P Paul
  *
  * This library is free software: you can redistribute it and/or modify
@@ -32,13 +32,13 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#include "KlangWellen.h"
+#include "Klangwellen.h"
 #include "AudioSignal.h"
 
 namespace klangwellen {
     class Ramp {
     public:
-        Ramp(uint32_t sample_rate = KlangWellen::DEFAULT_SAMPLE_RATE) : fSampleRate(sample_rate) {
+        Ramp(uint32_t sample_rate = Klangwellen::DEFAULT_SAMPLE_RATE) : fSampleRate(sample_rate) {
             fStartValue   = 0;
             fEndValue     = 0;
             fCurrentValue = 0;
@@ -80,7 +80,7 @@ namespace klangwellen {
         }
 
         void process(float*         signal_buffer,
-                     const uint32_t length = KlangWellen::DEFAULT_AUDIOBLOCK_SIZE) {
+                     const uint32_t length = Klangwellen::DEFAULT_AUDIOBLOCK_SIZE) {
             for (uint32_t i = 0; i < length; i++) {
                 signal_buffer[i] = process();
             }

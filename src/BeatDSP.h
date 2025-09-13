@@ -1,7 +1,7 @@
 /*
- * KlangWellen
+ * Klangwellen
  *
- * This file is part of the *KlangWellen* library (https://github.com/dennisppaul/klangwellen).
+ * This file is part of the *Klangwellen* library (https://github.com/dennisppaul/klangwellen).
  * Copyright (c) 2024 Dennis P Paul
  *
  * This library is free software: you can redistribute it and/or modify
@@ -33,7 +33,7 @@
 
 #include <vector>
 
-#include "KlangWellen.h"
+#include "Klangwellen.h"
 
 /**
  * similar to {@link wellen.Beat} with the exception that events are triggered from {@link DSP}.
@@ -46,7 +46,7 @@ namespace klangwellen {
 
     class BeatDSP {
     public:
-        BeatDSP(uint32_t sample_rate = KlangWellen::DEFAULT_SAMPLE_RATE) : fSampleRate(sample_rate), fBeat(-1) {
+        BeatDSP(uint32_t sample_rate = Klangwellen::DEFAULT_SAMPLE_RATE) : fSampleRate(sample_rate), fBeat(-1) {
             set_bpm(120);
         }
 
@@ -100,7 +100,7 @@ namespace klangwellen {
             return 0.0;
         }
 
-        void process(float* signal_buffer, const uint32_t buffer_length = KlangWellen::DEFAULT_AUDIOBLOCK_SIZE) {
+        void process(float* signal_buffer, const uint32_t buffer_length = Klangwellen::DEFAULT_AUDIOBLOCK_SIZE) {
             (void) signal_buffer;
             for (uint16_t i = 0; i < buffer_length; i++) {
                 process();

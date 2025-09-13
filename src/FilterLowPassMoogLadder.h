@@ -1,7 +1,7 @@
 /*
- * KlangWellen
+ * Klangwellen
  *
- * This file is part of the *KlangWellen* library (https://github.com/dennisppaul/klangwellen).
+ * This file is part of the *Klangwellen* library (https://github.com/dennisppaul/klangwellen).
  * Copyright (c) 2024 Dennis P Paul
  *
  * This library is free software: you can redistribute it and/or modify
@@ -33,7 +33,7 @@
 #include <algorithm>
 #include <cmath>
 
-#include "KlangWellen.h"
+#include "Klangwellen.h"
 
 /**
  * low-pass filter implementing the <em>Moog Ladder</em>.
@@ -59,7 +59,7 @@ namespace klangwellen {
         float       fTanhstg[3]{};
 
     public:
-        FilterLowPassMoogLadder() : FilterLowPassMoogLadder(KlangWellen::DEFAULT_SAMPLE_RATE) {}
+        FilterLowPassMoogLadder() : FilterLowPassMoogLadder(Klangwellen::DEFAULT_SAMPLE_RATE) {}
 
         explicit FilterLowPassMoogLadder(const float sample_rate) : fSampleRate(sample_rate), fOldAcr(0), fOldTune(0) {
             fResonance       = 0.4f;
@@ -75,7 +75,7 @@ namespace klangwellen {
         }
 
         void process(float*         signal_buffer,
-                     const uint32_t length = KlangWellen::DEFAULT_AUDIOBLOCK_SIZE) {
+                     const uint32_t length = Klangwellen::DEFAULT_AUDIOBLOCK_SIZE) {
             for (uint32_t i = 0; i < length; i++) {
                 signal_buffer[i] = process(signal_buffer[i]);
             }

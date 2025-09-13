@@ -1,7 +1,7 @@
 /*
- * KlangWellen
+ * Klangwellen
  *
- * This file is part of the *KlangWellen* library (https://github.com/dennisppaul/klangwellen).
+ * This file is part of the *Klangwellen* library (https://github.com/dennisppaul/klangwellen).
  * Copyright (c) 2024 Dennis P Paul
  *
  * This library is free software: you can redistribute it and/or modify
@@ -53,7 +53,7 @@
 #endif
 
 namespace klangwellen {
-    class KlangWellen {
+    class Klangwellen {
     public:
         static constexpr int      DEFAULT_AUDIOBLOCK_SIZE               = KLANGWELLEN_DEFAULT_AUDIOBLOCK_SIZE;
         static constexpr uint32_t DEFAULT_SAMPLE_RATE                   = KLANGWELLEN_DEFAULT_SAMPLE_RATE;
@@ -68,7 +68,7 @@ namespace klangwellen {
         static constexpr float    DEFAULT_FILTER_BANDWIDTH              = 100.0f;
         static constexpr float    DEFAULT_FILTER_FREQUENCY              = 1000.0f;
         static constexpr float    DEFAULT_RELEASE                       = 0.075f;
-        static constexpr uint32_t DEFAULT_INTERPOLATE_AMP_FREQ_DURATION = 5.f / 1000.f * static_cast<float>(DEFAULT_SAMPLE_RATE); // KlangWellen::millis_to_samples(5);
+        static constexpr uint32_t DEFAULT_INTERPOLATE_AMP_FREQ_DURATION = 5.f / 1000.f * static_cast<float>(DEFAULT_SAMPLE_RATE); // Klangwellen::millis_to_samples(5);
         static constexpr float    DEFAULT_SUSTAIN                       = 0.5f;
         static constexpr int      DEFAULT_WAVETABLE_SIZE                = 512;
         static constexpr uint8_t  DISTORTION_HARD_CLIPPING              = 0;
@@ -529,7 +529,7 @@ namespace klangwellen {
 
         /* --- buffer --- */
 
-        static void fill(float* buffer, const float value, const uint32_t length = KlangWellen::DEFAULT_AUDIOBLOCK_SIZE) {
+        static void fill(float* buffer, const float value, const uint32_t length = Klangwellen::DEFAULT_AUDIOBLOCK_SIZE) {
             for (uint32_t i = 0; i < length; i++) {
                 buffer[i] = value;
             }
@@ -538,20 +538,20 @@ namespace klangwellen {
         /**
          * copies src into dst. dst will be overwritten.
          */
-        static void copy(float* src, float* dst, const uint32_t length = KlangWellen::DEFAULT_AUDIOBLOCK_SIZE) {
+        static void copy(float* src, float* dst, const uint32_t length = Klangwellen::DEFAULT_AUDIOBLOCK_SIZE) {
             std::copy_n(src, length, dst);
         }
 
         /**
          * adds buffer_b to buffer_a. result will be stored in buffer_a, buffer_b will not be changed.
          */
-        static void add(float* buffer_a, const float* buffer_b, const uint32_t length = KlangWellen::DEFAULT_AUDIOBLOCK_SIZE) {
+        static void add(float* buffer_a, const float* buffer_b, const uint32_t length = Klangwellen::DEFAULT_AUDIOBLOCK_SIZE) {
             for (uint32_t i = 0; i < length; i++) {
                 buffer_a[i] += buffer_b[i];
             }
         }
 
-        static void add(float* buffer_a, const float scalar, const uint32_t length = KlangWellen::DEFAULT_AUDIOBLOCK_SIZE) {
+        static void add(float* buffer_a, const float scalar, const uint32_t length = Klangwellen::DEFAULT_AUDIOBLOCK_SIZE) {
             for (uint32_t i = 0; i < length; i++) {
                 buffer_a[i] += scalar;
             }
@@ -560,13 +560,13 @@ namespace klangwellen {
         /**
          * subtracts buffer_b from buffer_a. result will be stored in buffer_a, buffer_b will not be changed.
          */
-        static void sub(float* buffer_a, const float* buffer_b, const uint32_t length = KlangWellen::DEFAULT_AUDIOBLOCK_SIZE) {
+        static void sub(float* buffer_a, const float* buffer_b, const uint32_t length = Klangwellen::DEFAULT_AUDIOBLOCK_SIZE) {
             for (uint32_t i = 0; i < length; i++) {
                 buffer_a[i] -= buffer_b[i];
             }
         }
 
-        static void sub(float* buffer_a, const float scalar, const uint32_t length = KlangWellen::DEFAULT_AUDIOBLOCK_SIZE) {
+        static void sub(float* buffer_a, const float scalar, const uint32_t length = Klangwellen::DEFAULT_AUDIOBLOCK_SIZE) {
             for (uint32_t i = 0; i < length; i++) {
                 buffer_a[i] -= scalar;
             }
@@ -575,13 +575,13 @@ namespace klangwellen {
         /**
          * multiplies buffer_b with buffer_a. result will be stored in buffer_a, buffer_b will not be changed.
          */
-        static void mult(float* buffer_a, const float* buffer_b, const uint32_t length = KlangWellen::DEFAULT_AUDIOBLOCK_SIZE) {
+        static void mult(float* buffer_a, const float* buffer_b, const uint32_t length = Klangwellen::DEFAULT_AUDIOBLOCK_SIZE) {
             for (uint32_t i = 0; i < length; i++) {
                 buffer_a[i] *= buffer_b[i];
             }
         }
 
-        static void mult(float* buffer_a, const float scalar, const uint32_t length = KlangWellen::DEFAULT_AUDIOBLOCK_SIZE) {
+        static void mult(float* buffer_a, const float scalar, const uint32_t length = Klangwellen::DEFAULT_AUDIOBLOCK_SIZE) {
             for (uint32_t i = 0; i < length; i++) {
                 buffer_a[i] *= scalar;
             }
@@ -590,13 +590,13 @@ namespace klangwellen {
         /**
          * divides buffer_b from buffer_a. result will be stored in buffer_a, buffer_b will not be changed.
          */
-        static void div(float* buffer_a, const float* buffer_b, const uint32_t length = KlangWellen::DEFAULT_AUDIOBLOCK_SIZE) {
+        static void div(float* buffer_a, const float* buffer_b, const uint32_t length = Klangwellen::DEFAULT_AUDIOBLOCK_SIZE) {
             for (uint32_t i = 0; i < length; i++) {
                 buffer_a[i] /= buffer_b[i];
             }
         }
 
-        static void div(float* buffer_a, const float scalar, const uint32_t length = KlangWellen::DEFAULT_AUDIOBLOCK_SIZE) {
+        static void div(float* buffer_a, const float scalar, const uint32_t length = Klangwellen::DEFAULT_AUDIOBLOCK_SIZE) {
             for (uint32_t i = 0; i < length; i++) {
                 buffer_a[i] /= scalar;
             }

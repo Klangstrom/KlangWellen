@@ -1,7 +1,7 @@
 /*
-* KlangWellen
+* Klangwellen
  *
- * This file is part of the *KlangWellen* library (https://github.com/dennisppaul/klangwellen).
+ * This file is part of the *Klangwellen* library (https://github.com/dennisppaul/klangwellen).
  * Copyright (c) 2024 Dennis P Paul
  *
  * This library is free software: you can redistribute it and/or modify
@@ -33,7 +33,7 @@
 #include <stdio.h>
 #include <cmath>
 
-#include "KlangWellen.h"
+#include "Klangwellen.h"
 #include "Wavetable.h"
 
 namespace klangwellen {
@@ -50,11 +50,11 @@ namespace klangwellen {
                                                                                    mCarrier(new Wavetable(wavetable_size, sampling_rate)),
                                                                                    mModulationDepth(1.0f),
                                                                                    mModulator(new Wavetable(wavetable_size, sampling_rate)) {
-            mCarrier->set_interpolation(KlangWellen::WAVESHAPE_INTERPOLATE_LINEAR);
-            Wavetable::fill(mCarrier->get_wavetable(), mCarrier->get_wavetable_size(), KlangWellen::WAVEFORM_SINE);
+            mCarrier->set_interpolation(Klangwellen::WAVESHAPE_INTERPOLATE_LINEAR);
+            Wavetable::fill(mCarrier->get_wavetable(), mCarrier->get_wavetable_size(), Klangwellen::WAVEFORM_SINE);
 
-            mModulator->set_interpolation(KlangWellen::WAVESHAPE_INTERPOLATE_LINEAR);
-            Wavetable::fill(mModulator->get_wavetable(), mModulator->get_wavetable_size(), KlangWellen::WAVEFORM_SINE);
+            mModulator->set_interpolation(Klangwellen::WAVESHAPE_INTERPOLATE_LINEAR);
+            Wavetable::fill(mModulator->get_wavetable(), mModulator->get_wavetable_size(), Klangwellen::WAVEFORM_SINE);
             fDeleteCarrier = true;
         }
 

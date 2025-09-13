@@ -1,7 +1,7 @@
 /*
- * KlangWellen
+ * Klangwellen
  *
- * This file is part of the *KlangWellen* library (https://github.com/dennisppaul/klangwellen).
+ * This file is part of the *Klangwellen* library (https://github.com/dennisppaul/klangwellen).
  * Copyright (c) 2024 Dennis P Paul
  *
  * This library is free software: you can redistribute it and/or modify
@@ -33,7 +33,7 @@
 
 #include <vector>
 
-#include "KlangWellen.h"
+#include "Klangwellen.h"
 
 /**
  * generates an event from an oscillating input signal.
@@ -84,7 +84,7 @@ namespace klangwellen {
             return signal;
         }
 
-        void process(float* signal_buffer, const uint32_t buffer_length = KlangWellen::DEFAULT_AUDIOBLOCK_SIZE) {
+        void process(float* signal_buffer, const uint32_t buffer_length = Klangwellen::DEFAULT_AUDIOBLOCK_SIZE) {
             for (uint16_t i = 0; i < buffer_length; i++) {
                 process(signal_buffer[i]);
             }

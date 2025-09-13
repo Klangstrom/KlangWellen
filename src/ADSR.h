@@ -1,7 +1,7 @@
 /*
- * KlangWellen
+ * Klangwellen
  *
- * This file is part of the *KlangWellen* library (https://github.com/dennisppaul/klangwellen).
+ * This file is part of the *Klangwellen* library (https://github.com/dennisppaul/klangwellen).
  * Copyright (c) 2024 Dennis P Paul
  *
  * This library is free software: you can redistribute it and/or modify
@@ -29,7 +29,7 @@
 
 #pragma once
 
-#include "KlangWellen.h"
+#include "Klangwellen.h"
 #include "AudioSignal.h"
 
 namespace klangwellen {
@@ -52,13 +52,13 @@ namespace klangwellen {
          *
          */
     public:
-        explicit ADSR(uint32_t sample_rate = KlangWellen::DEFAULT_SAMPLE_RATE) : fSampleRate(sample_rate), FADE_TO_ZERO_RATE_SEC(0.01f), USE_FADE_TO_ZERO_STATE(false) {
+        explicit ADSR(uint32_t sample_rate = Klangwellen::DEFAULT_SAMPLE_RATE) : fSampleRate(sample_rate), FADE_TO_ZERO_RATE_SEC(0.01f), USE_FADE_TO_ZERO_STATE(false) {
             fAmp     = 0.0f;
-            fAttack  = KlangWellen::DEFAULT_ATTACK;
-            fDecay   = KlangWellen::DEFAULT_DECAY;
+            fAttack  = Klangwellen::DEFAULT_ATTACK;
+            fDecay   = Klangwellen::DEFAULT_DECAY;
             fDelta   = 0.0f;
-            fRelease = KlangWellen::DEFAULT_RELEASE;
-            fSustain = KlangWellen::DEFAULT_SUSTAIN;
+            fRelease = Klangwellen::DEFAULT_RELEASE;
+            fSustain = Klangwellen::DEFAULT_SUSTAIN;
             fState   = ENVELOPE_STATE::IDLE;
             setState(ENVELOPE_STATE::IDLE);
         }
@@ -81,7 +81,7 @@ namespace klangwellen {
 
         void process(float*         signal_buffer_left,
                      float*         signal_buffer_right,
-                     const uint32_t buffer_length = KlangWellen::DEFAULT_AUDIOBLOCK_SIZE) {
+                     const uint32_t buffer_length = Klangwellen::DEFAULT_AUDIOBLOCK_SIZE) {
             for (uint32_t i = 0; i < buffer_length; i++) {
                 step();
                 signal_buffer_left[i] *= fAmp;
@@ -89,7 +89,7 @@ namespace klangwellen {
             }
         }
 
-        void process(float* signal_buffer, const uint32_t buffer_length = KlangWellen::DEFAULT_AUDIOBLOCK_SIZE) {
+        void process(float* signal_buffer, const uint32_t buffer_length = Klangwellen::DEFAULT_AUDIOBLOCK_SIZE) {
             for (uint32_t i = 0; i < buffer_length; i++) {
                 step();
                 signal_buffer[i] *= fAmp;
