@@ -1,5 +1,3 @@
-# KlangWellen
-
 *KlangWellen* is a C++ library for processing audio signals. each processor ( or class ) is designed around a central
 `process` method that
 either receives and/or emitts samples.
