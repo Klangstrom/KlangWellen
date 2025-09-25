@@ -15,7 +15,7 @@ void setup() {
     Serial.println("16.Envelope");
     Serial.println("-----------");
 
-    fWavetable.set_waveform(KlangWellen::WAVEFORM_SAWTOOTH);
+    fWavetable.set_waveform(Klangwellen::WAVEFORM_SAWTOOTH);
     fWavetable.set_frequency(55.0);
     fWavetable.set_amplitude(0.0);
 
@@ -47,5 +47,5 @@ void audioblock(float** input_signal, float** output_signal) {
         fWavetable.set_amplitude(fAmplitudeEnvelope.process());
         output_signal[LEFT][i] = fWavetable.process();
     }
-    KlangWellen::copy(output_signal[LEFT], output_signal[RIGHT]);
+    Klangwellen::copy(output_signal[LEFT], output_signal[RIGHT]);
 }

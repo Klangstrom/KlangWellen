@@ -16,7 +16,7 @@ void setup() {
     Serial.println("12.Clamp");
     Serial.println("--------");
 
-    fWavetable.set_waveform(KlangWellen::WAVEFORM_SINE);
+    fWavetable.set_waveform(Klangwellen::WAVEFORM_SINE);
     fClamp.set_min(-0.1);
     fClamp.set_max(0.1);
 }
@@ -35,5 +35,5 @@ void audioblock(float** input_signal, float** output_signal) {
     fWavetable.process(output_signal[LEFT]);
     fADSR.process(output_signal[LEFT]);
     fClamp.process(output_signal[LEFT]);
-    KlangWellen::copy(output_signal[LEFT], output_signal[RIGHT]);
+    Klangwellen::copy(output_signal[LEFT], output_signal[RIGHT]);
 }

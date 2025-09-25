@@ -14,7 +14,7 @@ void setup() {
     Serial.println("02.ADSR");
     Serial.println("-------");
 
-    fWavetable.set_waveform(KlangWellen::WAVEFORM_SINE);
+    fWavetable.set_waveform(Klangwellen::WAVEFORM_SINE);
 }
 
 void loop() {}
@@ -31,5 +31,5 @@ void audioblock(float** input_signal, float** output_signal) {
     for (uint16_t i = 0; i < KLANG_SAMPLES_PER_AUDIO_BLOCK; i++) {
         output_signal[LEFT][i] = fWavetable.process() * fADSR.process();
     }
-    KlangWellen::copy(output_signal[LEFT], output_signal[RIGHT]);
+    Klangwellen::copy(output_signal[LEFT], output_signal[RIGHT]);
 }

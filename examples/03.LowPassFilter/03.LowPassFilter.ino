@@ -13,7 +13,7 @@ void setup() {
     Serial.println("03.LowPassFilter");
     Serial.println("----------------");
 
-    fWavetable.set_waveform(KlangWellen::WAVEFORM_SQUARE);
+    fWavetable.set_waveform(Klangwellen::WAVEFORM_SQUARE);
     fWavetable.set_frequency(55);
     fFilter.set_resonance(0.85f);
     klangstrom::beats_per_minute(120 * 4);
@@ -30,11 +30,11 @@ void audioblock(float** input_signal, float** output_signal) {
     /* process as block ... */
     fWavetable.process(output_signal[LEFT]);
     fFilter.process(output_signal[LEFT]);
-    KlangWellen::copy(output_signal[LEFT], output_signal[RIGHT]);
+    Klangwellen::copy(output_signal[LEFT], output_signal[RIGHT]);
 
     // /* ... or as single samples */
     // for (uint16_t i = 0; i < KLANG_SAMPLES_PER_AUDIO_BLOCK; i++) {
     //     output_signal[LEFT][i] = fFilter.process(fWavetable.process());
     // }
-    // KlangWellen::copy(output_signal[LEFT], output_signal[RIGHT]);
+    // Klangwellen::copy(output_signal[LEFT], output_signal[RIGHT]);
 }

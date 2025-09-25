@@ -28,17 +28,9 @@
 #define M_PI 3.141592653589793238462643383279502884L
 #endif
 
-#ifndef PI
-#define PI M_PI
-#endif
-
-#ifndef TWO_PI
-#define TWO_PI (M_PI * 2)
-#endif
-
-#ifndef HALF_PI
-#define HALF_PI (M_PI / 2)
-#endif
+static constexpr float PI      = M_PI;
+static constexpr float TWO_PI  = M_PI * 2;
+static constexpr float HALF_PI = M_PI / 2;
 
 #ifndef KLANGWELLEN_DEFAULT_AUDIOBLOCK_SIZE
 #define KLANGWELLEN_DEFAULT_AUDIOBLOCK_SIZE 512

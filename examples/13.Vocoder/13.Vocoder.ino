@@ -1,4 +1,4 @@
-#include "KlangWellen.h"
+#include "Klangwellen.h"
 #include "Klangstrom.h"
 #include "SAM.h"
 #include "Vocoder.h"
@@ -19,7 +19,7 @@ void setup() {
 
     fSAM.speak("hello world");
 
-    fWavetable.set_waveform(KlangWellen::WAVEFORM_SAWTOOTH);
+    fWavetable.set_waveform(Klangwellen::WAVEFORM_SAWTOOTH);
     fWavetable.set_frequency(55);
     fWavetable.set_amplitude(1.0);
 
@@ -33,7 +33,7 @@ void setup() {
 void loop() {}
 
 void beat(uint32_t beat_counter) {
-    fWavetable.set_frequency(27.5 * KlangWellen::pow(2, beat_counter % 4));
+    fWavetable.set_frequency(27.5 * Klangwellen::pow(2, beat_counter % 4));
     fSAM.speak_from_buffer();
 }
 
@@ -43,5 +43,5 @@ void audioblock(float** input_signal, float** output_signal) {
     fSAM.process(mModulator);
     fWavetable.process(mCarrier);
     fVocoder.process(mCarrier, mModulator, output_signal[LEFT]);
-    KlangWellen::copy(output_signal[LEFT], output_signal[RIGHT]);
+    Klangwellen::copy(output_signal[LEFT], output_signal[RIGHT]);
 }

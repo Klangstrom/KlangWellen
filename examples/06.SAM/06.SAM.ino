@@ -1,4 +1,4 @@
-#include "KlangWellen.h"
+#include "Klangwellen.h"
 #include "Klangstrom.h"
 #include "SAM.h"
 
@@ -34,6 +34,6 @@ void beat(uint32_t beat_counter) {
 void audioblock(float** input_signal, float** output_signal) {
     fSAM_right.process(output_signal[LEFT]);
     fSAM_left.process(output_signal[RIGHT]);
-    KlangWellen::mult(output_signal[LEFT], 0.25);
-    KlangWellen::mult(output_signal[RIGHT], 0.25);
+    Klangwellen::mult(output_signal[LEFT], 0.25);
+    Klangwellen::mult(output_signal[RIGHT], 0.25);
 }

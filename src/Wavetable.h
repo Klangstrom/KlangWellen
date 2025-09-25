@@ -35,17 +35,6 @@
 
 #include "Klangwellen.h"
 
-#ifndef PI
-#define PI M_PI
-#endif
-
-#ifndef TWO_PI
-#define TWO_PI (M_PI * 2)
-#endif
-
-#ifndef HALF_PI
-#define HALF_PI (M_PI / 2)
-#endif
 
 /**
  * plays back a chunk of samples ( i.e arbitrary, single-cycle waveform like sine, triangle, saw or square waves ) at

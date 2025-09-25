@@ -16,7 +16,7 @@ void setup() {
     Serial.println("04.Reverb");
     Serial.println("---------");
 
-    fWavetable.set_waveform(KlangWellen::WAVEFORM_SINE);
+    fWavetable.set_waveform(Klangwellen::WAVEFORM_SINE);
     fReverb.set_roomsize(0.9);
 }
 
@@ -46,6 +46,6 @@ void audioblock(float** input_signal, float** output_signal) {
     /* ... or as block ( stereo, fastest ) */
     fWavetable.process(output_signal[LEFT]);
     fADSR.process(output_signal[LEFT]);
-    KlangWellen::copy(output_signal[LEFT], output_signal[RIGHT]);
+    Klangwellen::copy(output_signal[LEFT], output_signal[RIGHT]);
     fReverb.process(output_signal[LEFT], output_signal[RIGHT]);
 }

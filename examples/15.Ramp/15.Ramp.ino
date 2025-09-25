@@ -17,7 +17,7 @@ void setup() {
     Serial.println("15.Ramp");
     Serial.println("-------");
 
-    fWavetable.set_waveform(KlangWellen::WAVEFORM_SAWTOOTH);
+    fWavetable.set_waveform(Klangwellen::WAVEFORM_SAWTOOTH);
     fWavetable.set_frequency(27.5);
     fFilter.set_resonance(0.3);
     fFilter.set_frequency(1);
@@ -50,5 +50,5 @@ void audioblock(float** input_signal, float** output_signal) {
         fFilter.set_frequency(fRampFilterFrequency.process());
         output_signal[LEFT][i] = fFilter.process(fWavetable.process());
     }
-    KlangWellen::copy(output_signal[LEFT], output_signal[RIGHT]);
+    Klangwellen::copy(output_signal[LEFT], output_signal[RIGHT]);
 }

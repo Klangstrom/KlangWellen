@@ -18,9 +18,9 @@ void setup() {
     Serial.println("10.BeatDSP");
     Serial.println("----------");
 
-    fWavetable.set_waveform(KlangWellen::WAVEFORM_SINE);
+    fWavetable.set_waveform(Klangwellen::WAVEFORM_SINE);
     fWavetable.set_frequency(220.0);
-    fWavetable_DSP.set_waveform(KlangWellen::WAVEFORM_TRIANGLE);
+    fWavetable_DSP.set_waveform(Klangwellen::WAVEFORM_TRIANGLE);
     fWavetable_DSP.set_frequency(110.0);
 
     fBeat.set_callback(beat_dsp);
