@@ -58,13 +58,13 @@ namespace klangwellen {
         }
 
         explicit SamplerT(int32_t  buffer_length,
-                          uint32_t sample_rate = KlangWellen::DEFAULT_SAMPLE_RATE) : SamplerT(new BUFFER_TYPE[buffer_length], buffer_length, sample_rate) {
+                          uint32_t sample_rate) : SamplerT(new BUFFER_TYPE[buffer_length], buffer_length, sample_rate) {
             fAllocatedBuffer = true;
         }
 
         SamplerT(BUFFER_TYPE*   buffer,
                  const int32_t  buffer_length,
-                 const uint32_t sample_rate = KlangWellen::DEFAULT_SAMPLE_RATE) : fSampleRate(sample_rate),
+                 const uint32_t sample_rate) : fSampleRate(sample_rate),
                                                                                   fDirectionForward(true),
                                                                                   fInPoint(0),
                                                                                   fOutPoint(0),
@@ -247,7 +247,7 @@ namespace klangwellen {
             return mSample;
         }
 
-        void process(float* signal_buffer, const uint32_t buffer_length = KlangWellen::DEFAULT_AUDIOBLOCK_SIZE) {
+        void process(float* signal_buffer, const uint32_t buffer_length) {
             for (uint16_t i = 0; i < buffer_length; i++) {
                 signal_buffer[i] = process();
             }

@@ -52,7 +52,7 @@ namespace klangwellen {
          *
          */
     public:
-        explicit ADSR(const uint32_t sample_rate = KlangWellen::DEFAULT_SAMPLE_RATE) : fSampleRate(sample_rate),
+        explicit ADSR(const uint32_t sample_rate) : fSampleRate(sample_rate),
                                                                                        FADE_TO_ZERO_RATE_SEC(0.01f),
                                                                                        USE_FADE_TO_ZERO_STATE(false) {
             _amplitude = 0.0f;
@@ -83,7 +83,7 @@ namespace klangwellen {
 
         void process(float*         signal_buffer_left,
                      float*         signal_buffer_right,
-                     const uint32_t buffer_length = KlangWellen::DEFAULT_AUDIOBLOCK_SIZE) {
+                     const uint32_t buffer_length) {
             for (uint32_t i = 0; i < buffer_length; i++) {
                 step();
                 signal_buffer_left[i] *= _amplitude;
@@ -91,7 +91,7 @@ namespace klangwellen {
             }
         }
 
-        void process(float* signal_buffer, const uint32_t buffer_length = KlangWellen::DEFAULT_AUDIOBLOCK_SIZE) {
+        void process(float* signal_buffer, const uint32_t buffer_length) {
             for (uint32_t i = 0; i < buffer_length; i++) {
                 step();
                 signal_buffer[i] *= _amplitude;

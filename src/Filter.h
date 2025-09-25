@@ -46,16 +46,16 @@ namespace klangwellen {
         static const uint8_t HSH              = 6; /* High shelf filter */
         static const uint8_t NUM_FILTER_TYPES = 7;
 
-        Filter(bool use_fast_math = true) : __USE_FAST_TRIG(use_fast_math) {
-            set(LPF, 0.0, 1000, 100, KlangWellen::DEFAULT_SAMPLE_RATE);
+        Filter(float sample_rate, bool use_fast_math = true) : __USE_FAST_TRIG(use_fast_math) {
+            set(LPF, 0.0, 1000, 100, sample_rate);
         }
 
         Filter(uint8_t type,
                float   dbGain,
                float   center_frequency,
                float   bandwidth,
-               bool    use_fast_math = true,
-               float   sample_rate   = KlangWellen::DEFAULT_SAMPLE_RATE) : __USE_FAST_TRIG(use_fast_math) {
+               float   sample_rate,
+               bool    use_fast_math = true) : __USE_FAST_TRIG(use_fast_math) {
             set(type, dbGain, center_frequency, bandwidth, sample_rate);
         }
 
@@ -81,7 +81,7 @@ namespace klangwellen {
         }
 
         void process(float*         signal_buffer,
-                     const uint32_t length = KlangWellen::DEFAULT_AUDIOBLOCK_SIZE) {
+                     const uint32_t length) {
             for (uint32_t i = 0; i < length; i++) {
                 signal_buffer[i] = process(signal_buffer[i]);
             }
@@ -91,7 +91,7 @@ namespace klangwellen {
                  float   dbGain, /* gain of filter */
                  float   center_frequency,
                  float   bandwidth, /* bandwidth in octaves */
-                 float   sample_rate = KlangWellen::DEFAULT_SAMPLE_RATE) {
+                 float   sample_rate) {
             // float A, omega, sn, cs, alpha, beta;
             float a0, a1, a2, b0, b1, b2;
 

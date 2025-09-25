@@ -46,7 +46,7 @@ namespace klangwellen {
 
     class BeatDSP {
     public:
-        BeatDSP(uint32_t sample_rate = KlangWellen::DEFAULT_SAMPLE_RATE) : fSampleRate(sample_rate), fBeat(-1) {
+        BeatDSP(uint32_t sample_rate) : fSampleRate(sample_rate), fBeat(-1) {
             set_bpm(120);
         }
 
@@ -70,7 +70,7 @@ namespace klangwellen {
         }
 
         /**
-         * sets the interval between beat events in samples
+         * sets the interval between beat_dsp events in samples
          *
          * @param interval in samples
          */
@@ -79,7 +79,7 @@ namespace klangwellen {
         }
 
         /**
-         * sets the interval between beat events in seconds
+         * sets the interval between beat_dsp events in seconds
          *
          * @param interval in seconds
          */
@@ -100,7 +100,7 @@ namespace klangwellen {
             return 0.0;
         }
 
-        void process(float* signal_buffer, const uint32_t buffer_length = KlangWellen::DEFAULT_AUDIOBLOCK_SIZE) {
+        void process(float* signal_buffer, const uint32_t buffer_length) {
             (void) signal_buffer;
             for (uint16_t i = 0; i < buffer_length; i++) {
                 process();

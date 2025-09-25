@@ -50,7 +50,7 @@ namespace klangwellen {
                const uint32_t      stream_buffer_size,
                const uint8_t       stream_buffer_division      = 4,
                const uint8_t       stream_buffer_update_offset = 1,
-               const uint32_t      sample_rate                 = KlangWellen::DEFAULT_SAMPLE_RATE)
+               const uint32_t      sample_rate                )
             : fStreamDataProvider(stream_data_provider),
               fBufferLength(stream_buffer_size),
               fBuffer(new float[stream_buffer_size]),
@@ -135,7 +135,7 @@ namespace klangwellen {
             return fBufferIndex;
         }
 
-        void process(float* signal_buffer, const uint32_t buffer_length = KlangWellen::DEFAULT_AUDIOBLOCK_SIZE) {
+        void process(float* signal_buffer, const uint32_t buffer_length) {
             for (uint16_t i = 0; i < buffer_length; i++) {
                 signal_buffer[i] = process();
             }

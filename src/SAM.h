@@ -1288,7 +1288,7 @@ namespace klangwellen {
             {200, 0, 0, 54, 55},
             {199, 0, 0, 54, 54}};
 
-        uint8_t GetRuleByte(unsigned short mem62, uint8_t Y) {
+        uint8_t GetRuleByte(const unsigned short mem62, const uint8_t Y) const {
             unsigned int address = mem62;
 
             if (mem62 >= 37541) {
@@ -1299,7 +1299,7 @@ namespace klangwellen {
             return rules[address + Y];
         }
 
-        void PrintPhonemes(uint8_t* phonemeindex, uint8_t* phonemeLength, uint8_t* stress) {
+        void PrintPhonemes(const uint8_t* phonemeindex, const uint8_t* phonemeLength, const uint8_t* stress) const {
             int i = 0;
             printf("===========================================\n");
 
@@ -1324,15 +1324,15 @@ namespace klangwellen {
             printf("\n");
         }
 
-        void PrintOutput(
-            uint8_t* flag,
-            uint8_t* f1,
-            uint8_t* f2,
-            uint8_t* f3,
-            uint8_t* a1,
-            uint8_t* a2,
-            uint8_t* a3,
-            uint8_t* p) {
+        static void PrintOutput(
+            const uint8_t* flag,
+            const uint8_t* f1,
+            const uint8_t* f2,
+            const uint8_t* f3,
+            const uint8_t* a1,
+            const uint8_t* a2,
+            const uint8_t* a3,
+            const uint8_t* p) {
             printf("===========================================\n");
             printf("Final data for speech output:\n\n");
             int i = 0;
@@ -1345,7 +1345,7 @@ namespace klangwellen {
             printf("===========================================\n");
         }
 
-        void PrintRule(int offset) {
+        void PrintRule(const int offset) const {
             int     i = 1;
             uint8_t A = 0;
             printf("Applying rule: ");
@@ -1370,7 +1370,7 @@ namespace klangwellen {
         // // #pragma GCC diagnostic ignored "-Wno-switch-unreachable"
         // #endif
 
-        void Code37055(uint8_t mem59) {
+        void Code37055(const uint8_t mem59) {
             X = mem59;
             X--;
             A = inputtemp[X];
@@ -1379,7 +1379,7 @@ namespace klangwellen {
             return;
         }
 
-        void Code37066(uint8_t mem58) {
+        void Code37066(const uint8_t mem58) {
             X = mem58;
             X++;
             A = inputtemp[X];
@@ -1441,7 +1441,7 @@ namespace klangwellen {
                     mem56++;
                     X        = mem56;
                     A        = 155;
-                    input[X] = (char) 155;
+                    input[X] = static_cast<char>(155);
                     // goto pos36542;
                     //           Code39771();    //Code39777();
                     return 1;
@@ -1489,7 +1489,7 @@ namespace klangwellen {
             // 36653 is unknown. Contains position
 
         pos36654:
-            input[X] = (char) 155;
+            input[X] = static_cast<char>(155);
             A        = mem61;
             mem36653 = A;
             //  mem29 = A; // not used
@@ -1960,7 +1960,7 @@ namespace klangwellen {
         // // #pragma GCC diagnostic ignored "-Wno-switch-unreachable"
         // #endif
 
-        void Output8BitAry(int index, uint8_t ary[5]) {
+        void Output8BitAry(const int index, uint8_t ary[5]) {
             int k;
             bufferpos += timetable[oldtimetableindex][index];
             oldtimetableindex = index;
@@ -1972,7 +1972,7 @@ namespace klangwellen {
                 }
             }
         }
-        void Output8Bit(int index, uint8_t A) {
+        void Output8Bit(const int index, const uint8_t A) {
             uint8_t ary[5] = {A, A, A, A, A};
             Output8BitAry(index, ary);
         }
@@ -1986,7 +1986,7 @@ namespace klangwellen {
         //  172=amplitude1
         //  173=amplitude2
         //  174=amplitude3
-        uint8_t Read(uint8_t p, uint8_t Y) {
+        uint8_t Read(const uint8_t p, const uint8_t Y) const {
             switch (p) {
                 case 168:
                     return pitches[Y];
@@ -2007,7 +2007,7 @@ namespace klangwellen {
             return 0;
         }
 
-        void Write(uint8_t p, uint8_t Y, uint8_t value) {
+        void Write(const uint8_t p, const uint8_t Y, const uint8_t value) {
             switch (p) {
                 case 168:
                     pitches[Y] = value;
@@ -2561,11 +2561,11 @@ namespace klangwellen {
                         //  ML : Code47503 is division with remainder, and mem50 gets the sign
 
                         // calculate change per frame
-                        int8_t m53     = (int8_t) mem53;
-                        mem50          = mem53 & 128;
-                        uint8_t m53abs = abs(m53);
-                        mem51          = m53abs % mem40; // abs((char)m53) % mem40;
-                        mem53          = (uint8_t) ((int8_t) (m53) / mem40);
+                        const int8_t m53     = static_cast<int8_t>(mem53);
+                        mem50                = mem53 & 128;
+                        const uint8_t m53abs = KlangWellen::abs(m53);
+                        mem51                = m53abs % mem40; // abs((char)m53) % mem40;
+                        mem53                = static_cast<uint8_t>(static_cast<int8_t>(m53) / mem40);
 
                         // interpolation range
                         X = mem40;  // number of frames to interpolate over
@@ -2695,13 +2695,13 @@ namespace klangwellen {
                     unsigned int p3 = phase3 * 256;
                     int          k;
                     for (k = 0; k < 5; k++) {
-                        int8_t     sp1  = (int8_t) sinus[0xff & (p1 >> 8)];
-                        int8_t     sp2  = (int8_t) sinus[0xff & (p2 >> 8)];
-                        int8_t     rp3  = (int8_t) rectangle[0xff & (p3 >> 8)];
-                        signed int sin1 = sp1 * ((uint8_t) amplitude1[Y] & 0x0f);
-                        signed int sin2 = sp2 * ((uint8_t) amplitude2[Y] & 0x0f);
-                        signed int rect = rp3 * ((uint8_t) amplitude3[Y] & 0x0f);
-                        signed int mux  = sin1 + sin2 + rect;
+                        const int8_t     sp1  = (int8_t) sinus[0xff & (p1 >> 8)];
+                        const int8_t     sp2  = (int8_t) sinus[0xff & (p2 >> 8)];
+                        const int8_t     rp3  = static_cast<int8_t>(rectangle[0xff & (p3 >> 8)]);
+                        const signed int sin1 = sp1 * ((uint8_t) amplitude1[Y] & 0x0f);
+                        const signed int sin2 = sp2 * ((uint8_t) amplitude2[Y] & 0x0f);
+                        const signed int rect = rp3 * ((uint8_t) amplitude3[Y] & 0x0f);
+                        signed int       mux  = sin1 + sin2 + rect;
                         mux /= 32;
                         mux += 128; // Go from signed to unsigned amplitude
                         ary[k] = mux;
@@ -2803,8 +2803,7 @@ namespace klangwellen {
                         }
                     }
 
-                    for (X = wait2; X > 0; X--)
-                        ; // wait
+                    for (X = wait2; X > 0; X--); // wait
                     mem56--;
                 } while (mem56 != 0);
 
@@ -2824,15 +2823,15 @@ namespace klangwellen {
         // index X. A rising inflection is used for questions, and
         // a falling inflection is used for statements.
 
-        void AddInflection(uint8_t mem48, uint8_t phase1) {
+        void AddInflection(const uint8_t mem48, uint8_t phase1) {
             // pos48372:
             //   mem48 = 255;
             // pos48376:
 
             // store the location of the punctuation
-            mem49     = X;
-            A         = X;
-            int Atemp = A;
+            mem49           = X;
+            A               = X;
+            const int Atemp = A;
 
             // backup 30 frames
             A = A - 30;
@@ -2874,30 +2873,30 @@ namespace klangwellen {
             mouth formant (F1) and the throat formant (F2). Only the voiced
             phonemes (5-29 and 48-53) are altered.
         */
-        void SetMouthThroat(uint8_t mouth, uint8_t throat) {
+        void SetMouthThroat(const uint8_t mouth, const uint8_t throat) {
             uint8_t initialFrequency;
             uint8_t newFrequency = 0;
             // uint8_t mouth; //mem38880
             // uint8_t throat; //mem38881
 
             // mouth formants (F1) 5..29
-            uint8_t mouthFormants5_29[30] = {
+            const uint8_t mouthFormants5_29[30] = {
                 0, 0, 0, 0, 0, 10,
                 14, 19, 24, 27, 23, 21, 16, 20, 14, 18, 14, 18, 18,
                 16, 13, 15, 11, 18, 14, 11, 9, 6, 6, 6};
 
             // throat formants (F2) 5..29
-            uint8_t throatFormants5_29[30] = {
+            const uint8_t throatFormants5_29[30] = {
                 255, 255,
                 255, 255, 255, 84, 73, 67, 63, 40, 44, 31, 37, 45, 73, 49,
                 36, 30, 51, 37, 29, 69, 24, 50, 30, 24, 83, 46, 54, 86};
 
             // there must be no zeros in this 2 tables
             // formant 1 frequencies (mouth) 48..53
-            uint8_t mouthFormants48_53[6] = {19, 27, 21, 27, 18, 13};
+            const uint8_t mouthFormants48_53[6] = {19, 27, 21, 27, 18, 13};
 
             // formant 2 frequencies (throat) 48..53
-            uint8_t throatFormants48_53[6] = {72, 39, 31, 43, 30, 34};
+            const uint8_t throatFormants48_53[6] = {72, 39, 31, 43, 30, 34};
 
             uint8_t pos = 5; // mem39216
             // pos38942:
@@ -2937,7 +2936,7 @@ namespace klangwellen {
         }
 
         // return = (mem39212*mem39213) >> 1
-        uint8_t trans(uint8_t mem39212, uint8_t mem39213) {
+        uint8_t trans(uint8_t mem39212, const uint8_t mem39213) {
             // pos39008:
             uint8_t carry;
             int     temp;
@@ -2956,7 +2955,7 @@ namespace klangwellen {
                                 */
                     carry = 0;
                     A     = mem39215;
-                    temp  = (int) A + (int) mem39213;
+                    temp  = static_cast<int>(A) + static_cast<int>(mem39213);
                     A     = A + mem39213;
                     if (temp > 255)
                         carry = 1;
@@ -2986,9 +2985,9 @@ namespace klangwellen {
 
         /* ------------------------ */
 
-        void SetInput(char* _input) {
+        void SetInput(const char* _input) {
             uint16_t i, l;
-            l = (uint16_t) strlen(_input);
+            l = static_cast<uint16_t>(strlen(_input));
             if (l > 254)
                 l = 254;
             for (i = 0; i < l; i++)
@@ -2996,14 +2995,14 @@ namespace klangwellen {
             input[l] = 0;
         }
 
-        void    SetSpeed(uint8_t _speed) { speed = _speed; }
-        void    SetPitch(uint8_t _pitch) { pitch = _pitch; }
-        void    SetMouth(uint8_t _mouth) { mouth = _mouth; }
-        void    SetThroat(uint8_t _throat) { throat = _throat; }
+        void    SetSpeed(const uint8_t _speed) { speed = _speed; }
+        void    SetPitch(const uint8_t _pitch) { pitch = _pitch; }
+        void    SetMouth(const uint8_t _mouth) { mouth = _mouth; }
+        void    SetThroat(const uint8_t _throat) { throat = _throat; }
         void    EnableSingmode() { singmode = 1; }
         void    DisableSingmode() { singmode = 0; }
-        int8_t* GetBuffer() { return SAM_buffer; }
-        int     GetBufferLength() { return bufferpos; }
+        int8_t* GetBuffer() const { return SAM_buffer; }
+        int     GetBufferLength() const { return bufferpos; }
 
         // 168=pitches
         // 169=frequency1
@@ -3085,7 +3084,7 @@ namespace klangwellen {
                 }
                 if (A == 254) {
                     X++;
-                    int temp = X;
+                    const int temp = X;
                     // mem[48546] = X;
                     phonemeIndexOutput[Y] = 255;
                     Render();
@@ -3222,7 +3221,7 @@ namespace klangwellen {
         }
 
         // void Code41014()
-        void Insert(uint8_t position /*var57*/, uint8_t mem60, uint8_t mem59, uint8_t mem58) {
+        void Insert(const uint8_t position /*var57*/, const uint8_t mem60, const uint8_t mem59, const uint8_t mem58) {
             int i;
             for (i = 253; i >= position; i--) // ML : always keep last safe-guarding 255
             {
@@ -3791,7 +3790,7 @@ namespace klangwellen {
                     if (A == 60) // 'G'
                     {
                         // Get the following character
-                        uint8_t index = phonemeindex[pos + 1];
+                        const uint8_t index = phonemeindex[pos + 1];
 
                         // At end of buffer?
                         if (index == 255) // prevent buffer overflow
@@ -4285,7 +4284,7 @@ namespace klangwellen {
                     if (debug)
                         printf("phoneme %d (%c%c) length %d\n", X - 1, signInputTable1[phonemeindex[X - 1]], signInputTable2[phonemeindex[X - 1]], phonemeLength[X - 1]);
                     // X gets overwritten, so hold prior X value for debug statement
-                    int debugX = X;
+                    const int debugX = X;
                     // shorten the prior phoneme length to (length/2 + 1)
                     phonemeLength[X] = (phonemeLength[X] >> 1) + 1;
                     X                = loopIndex;
@@ -4347,7 +4346,7 @@ namespace klangwellen {
 
         // -------------------------------------------------------------------------
         // ML : Code47503 is division with remainder, and mem50 gets the sign
-        void Code47503(uint8_t mem52) {
+        void Code47503(const uint8_t mem52) {
             Y = 0;
             if ((mem53 & 128) != 0) {
                 mem53 = -mem53;
@@ -4356,9 +4355,9 @@ namespace klangwellen {
             mem50 = Y;
             A     = 0;
             for (X = 8; X > 0; X--) {
-                int temp = mem53;
-                mem53    = mem53 << 1;
-                A        = A << 1;
+                const int temp = mem53;
+                mem53          = mem53 << 1;
+                A              = A << 1;
                 if (temp >= 128)
                     A++;
                 if (A >= mem52) {
@@ -4375,52 +4374,52 @@ namespace klangwellen {
     public:
         SAM() : SAM(65536) {}
 
-        SAM(uint32_t pBufferLength) {
+        explicit SAM(const uint32_t pBufferLength) {
             SAM_buffer            = new int8_t[pBufferLength];
             SAM_buffer_max_length = pBufferLength;
-            fAllocatedBuffer      = true;
+            _allocated_buffer     = true;
             setDefaults();
         }
 
-        SAM(int8_t* pBuffer, uint32_t pBufferLength) {
+        SAM(int8_t* pBuffer, const uint32_t pBufferLength) {
             SAM_buffer            = pBuffer;
             SAM_buffer_max_length = pBufferLength;
-            fAllocatedBuffer      = false;
+            _allocated_buffer     = false;
             setDefaults();
         }
 
         ~SAM() {
-            if (fAllocatedBuffer) {
+            if (_allocated_buffer) {
                 delete[] SAM_buffer;
             }
         }
 
-        void set_buffer(int8_t* pBuffer, uint32_t pBufferLength) {
+        void set_buffer(int8_t* pBuffer, const uint32_t pBufferLength) {
             SAM_buffer            = pBuffer;
             SAM_buffer_max_length = pBufferLength;
         }
 
-        void set_pitch(uint8_t pPitch) {
-            mPitch = pPitch;
+        void set_pitch(const uint8_t pPitch) {
+            _pitch = pPitch;
             SetPitch(pPitch); // default: pitch = 64
         }
 
-        void set_throat(uint8_t pThroat) {
-            mThroat = pThroat;
+        void set_throat(const uint8_t pThroat) {
+            _throat = pThroat;
             SetThroat(pThroat); // default: throat = 128
         }
 
-        void set_speed(uint8_t pSpeed) {
-            mSpeed = pSpeed;
+        void set_speed(const uint8_t pSpeed) {
+            _speed = pSpeed;
             SetSpeed(pSpeed);
         }
 
-        void set_mouth(uint8_t pMouth) {
-            mMouth = pMouth;
+        void set_mouth(const uint8_t pMouth) {
+            _mouth = pMouth;
             SetMouth(pMouth);
         }
 
-        void set_sing_mode(bool pMode) {
+        void set_sing_mode(const bool pMode) {
             if (pMode) {
                 EnableSingmode();
             } else {
@@ -4428,7 +4427,7 @@ namespace klangwellen {
             }
         }
 
-        void speak(string pText, bool pUsePhonemes = false) {
+        void speak(string pText, const bool pUsePhonemes = false) {
             char input[256];
             if (pUsePhonemes) {
                 pText.length() < 255 ? strcpy(input, pText.c_str()) : strncpy(input, pText.c_str(), 255);
@@ -4445,60 +4444,60 @@ namespace klangwellen {
             }
             SetInput(input);
             SAMMain();
-            mDoneSpeaking = false;
-            mCounter      = 0;
+            _done_speaking = false;
+            _counter       = 0;
         }
 
-        void speak_ascii(int pASCIIValue) {
+        void speak_ascii(const int pASCIIValue) {
             stringstream ss;
-            ss << (char) pASCIIValue;
+            ss << static_cast<char>(pASCIIValue);
             string s;
             ss >> s;
             speak(s);
         }
 
         void speak_from_buffer() {
-            mDoneSpeaking = false;
-            mCounter      = 0;
+            _done_speaking = false;
+            _counter       = 0;
         }
 
         /**
          * renders text into buffer but does not play it immediately
          */
-        void speak_to_buffer(string pText, bool pUsePhonemes = false) {
+        void speak_to_buffer(string pText, const bool pUsePhonemes = false) {
             speak(pText, pUsePhonemes);
-            mDoneSpeaking = true;
-            mCounter      = get_used_buffer_length() - 1;
+            _done_speaking = true;
+            _counter       = get_used_buffer_length() - 1;
         }
 
         void stop() {
-            mDoneSpeaking = true;
-            mCounter      = get_used_buffer_length() - 1;
+            _done_speaking = true;
+            _counter       = get_used_buffer_length() - 1;
         }
 
-        uint32_t get_used_buffer_length() {
+        uint32_t get_used_buffer_length() const {
             return GetBufferLength() / 50;
         }
 
-        void process(float* signal_buffer, const uint32_t buffer_length = KlangWellen::DEFAULT_AUDIOBLOCK_SIZE) {
-            uint8_t*       mBuffer       = (uint8_t*) GetBuffer();
+        void process(float* signal_buffer, const uint32_t buffer_length) {
+            const uint8_t* mBuffer       = (uint8_t*) GetBuffer();
             const uint32_t mBufferLength = get_used_buffer_length();
             for (uint32_t i = 0; i < buffer_length; i += 2) {
                 float mSample = 0.0;
-                if (!mDoneSpeaking && mBufferLength > 0) {
-                    mSample = mBuffer[mCounter] / 255.0 * 2.0 - 1.0;
-                    mCounter++;
-                    if (mCounter >= mBufferLength) {
-                        mDoneSpeaking = true;
+                if (!_done_speaking && mBufferLength > 0) {
+                    mSample = mBuffer[_counter] / 255.0 * 2.0 - 1.0;
+                    _counter++;
+                    if (_counter >= mBufferLength) {
+                        _done_speaking = true;
                     }
-                    mCounter %= mBufferLength;
+                    _counter %= mBufferLength;
                 }
                 signal_buffer[i]     = mSample;
                 signal_buffer[i + 1] = mSample;
             }
         }
 
-        uint8_t set_pitch_from_MIDI_note(uint8_t MIDI_note) {
+        uint8_t set_pitch_from_MIDI_note(const uint8_t MIDI_note) {
             if (MIDI_note >= 21 && MIDI_note <= 127) {
                 const uint8_t mSAMPitch = SAM_MIDI_NOTE_TOSAM_PITCH_MAP[MIDI_note - 21];
                 set_pitch(mSAMPitch);
@@ -4508,14 +4507,14 @@ namespace klangwellen {
         }
 
     private:
-        uint8_t mPitch;
-        uint8_t mThroat;
-        uint8_t mMouth;
-        uint8_t mSpeed;
+        uint8_t _pitch;
+        uint8_t _throat;
+        uint8_t _mouth;
+        uint8_t _speed;
 
-        uint32_t mCounter         = 0;
-        bool     mDoneSpeaking    = false;
-        bool     fAllocatedBuffer = false;
+        uint32_t _counter          = 0;
+        bool     _done_speaking    = false;
+        bool     _allocated_buffer = false;
 
         void setDefaults() {
             set_pitch(64);

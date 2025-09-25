@@ -71,7 +71,7 @@ namespace klangwellen {
             fType = type;
         }
 
-        void process(float* signal_buffer, const uint32_t length = KlangWellen::DEFAULT_AUDIOBLOCK_SIZE) {
+        void process(float* signal_buffer, const uint32_t length) {
             switch (fType) {
                 case ATAN:
                     for (uint32_t i = 0; i < length; i++) {

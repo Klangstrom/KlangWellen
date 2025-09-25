@@ -39,7 +39,7 @@ namespace klangwellen {
     public:
         EnvelopeFollower(float attackTime  = 0.01,
                          float releaseTime = 0.1,
-                         float sampleRate  = KlangWellen::DEFAULT_SAMPLE_RATE)
+                         float sampleRate )
             : fAttackTime(attackTime), fReleaseTime(releaseTime), fSampleRate(sampleRate) {
             setAttackTime(attackTime);
             setReleaseTime(releaseTime);

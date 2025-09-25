@@ -35,7 +35,6 @@
 #include <stdio.h>
 
 #include "KlangWellen.h"
-#include "AudioSignal.h"
 
 namespace klangwellen {
 
@@ -45,11 +44,12 @@ namespace klangwellen {
     class Delay {
     public:
         /**
-         * @param echo_length in seconds
          * @param sample_rate the sample rate in Hz.
+         * @param echo_length in seconds
          * @param decay_rate  the decay of the echo, a value between 0 and 1. 1 meaning no decay, 0 means immediate decay
+         * @param wet         the wet mix, a value between 0 and 1. 0 means dry only, 1 means wet only.
          */
-        Delay(float echo_length = 0.5, float decay_rate = 0.75, float wet = 0.8, uint32_t sample_rate = KlangWellen::DEFAULT_SAMPLE_RATE) : fSampleRate(sample_rate) {
+        explicit Delay(const uint32_t sample_rate, const float echo_length = 0.5, const float decay_rate = 0.75, const float wet = 0.8) : _sample_rate(sample_rate) {
             set_decay_rate(decay_rate);
             set_echo_length(echo_length);
             set_wet(wet);
@@ -59,8 +59,8 @@ namespace klangwellen {
         /**
          * @param echo_length new echo buffer length in seconds.
          */
-        void set_echo_length(float echo_length) {
-            fNewEchoLength = echo_length;
+        void set_echo_length(const float echo_length) {
+            _new_echo_length = echo_length;
         }
 
         /**
@@ -68,76 +68,121 @@ namespace klangwellen {
          *
          * @param decay_rate the new decay (preferably between zero and one).
          */
-        void set_decay_rate(float decay_rate) {
-            fDecayRate = decay_rate;
+        void set_decay_rate(const float decay_rate) {
+            _decay_rate = decay_rate;
         }
 
-        float get_decay_rate() {
-            return fDecayRate;
+        float get_decay_rate() const {
+            return _decay_rate;
         }
 
-        void set_wet(float wet) {
-            fWet = KlangWellen::clamp(wet, 0, 1);
+        void set_wet(const float wet) {
+            _wet = KlangWellen::clamp(wet, 0, 1);
         }
 
-        float get_wet() {
-            return fWet;
+        float get_wet() const {
+            return _wet;
         }
 
-        float process(float signal) {
+        float process(const float input) {
+            if (KlangWellen::abs(input) < 0.00001f) {
+                return 0; // avoid denormals
+            }
+            if (_buffer == nullptr) {
+                return input;
+            }
+            if (_buffer_length == 0) {
+                return input; // no delay allocated yet
+            }
+
             adaptEchoLength();
 
-            if (fBufferPosition >= fBufferLength) {
-                fBufferPosition = 0;
+            if (_buffer_position >= _buffer_length) {
+                _buffer_position = 0;
             }
-            const float mDry         = 1.0 - fWet;
-            const float mEcho        = fBuffer[fBufferPosition] * fDecayRate;
-            signal                   = signal * mDry + mEcho * fWet;
-            fBuffer[fBufferPosition] = signal;
-            fBufferPosition++;
 
-            return signal;
+            const float dry  = 1.0f - _wet;
+            const float echo = _buffer[_buffer_position];
+
+            // Output: dry + wet * echo
+            const float output = input * dry + echo * _wet;
+
+            // Write back only the feedback content (echoed input), not the mixed output
+            _buffer[_buffer_position] = input + echo * _decay_rate;
+
+            _buffer_position++;
+
+            return output;
+
+            // const float signal = input + _buffer[_buffer_position] * _decay_rate;
+            // _buffer[_buffer_position] = signal;
+            // _buffer_position++;
+            // return signal * _wet;
         }
 
         void process(float*         signal_buffer,
-                     const uint32_t length = KlangWellen::DEFAULT_AUDIOBLOCK_SIZE) {
+                     const uint32_t length) {
             for (uint32_t i = 0; i < length; i++) {
                 signal_buffer[i] = process(signal_buffer[i]);
             }
         }
 
     private:
-        int32_t  fBufferPosition  = 0;
-        float    fDecayRate       = 0;
-        float    fWet             = 0;
-        float*   fBuffer          = nullptr;
-        bool     fAllocatedBuffer = false;
-        int32_t  fBufferLength    = 0;
-        float    fNewEchoLength   = 0;
-        uint32_t fSampleRate;
+        int32_t        _buffer_position  = 0;
+        float          _decay_rate       = 0;
+        float          _wet              = 0;
+        float*         _buffer           = nullptr;
+        bool           _allocated_buffer = false;
+        int32_t        _buffer_length    = 0;
+        float          _new_echo_length  = 0;
+        const uint32_t _sample_rate;
 
         void adaptEchoLength() {
-            if (fNewEchoLength > 0) {
-                const uint32_t mNewBufferLength = (uint32_t) (fSampleRate * fNewEchoLength);
-                float*         mNewBuffer       = new float[mNewBufferLength]{0};
-                if (fBuffer != nullptr) {
-                    for (uint32_t i = 0; i < mNewBufferLength; i++) {
-                        if (fBufferPosition >= fBufferLength) {
-                            fBufferPosition = 0;
-                        }
-                        mNewBuffer[i] = fBuffer[fBufferPosition];
-                        fBufferPosition++;
+            if (_new_echo_length > 0) {
+                const uint32_t _new_buffer_length = static_cast<uint32_t>(_sample_rate * _new_echo_length);
+                if (_new_buffer_length == 0) {
+                    // reset buffer to avoid out-of-bounds
+                    if (_allocated_buffer && _buffer != nullptr) {
+                        delete[] _buffer;
                     }
-                    fBufferPosition = 0;
+                    _buffer           = nullptr;
+                    _buffer_length    = 0;
+                    _buffer_position  = 0;
+                    _allocated_buffer = false;
+                    _new_echo_length  = -1;
+                    return;
                 }
-                if (fAllocatedBuffer && fBuffer != nullptr) {
-                    delete[] fBuffer;
+
+                const auto _new_buffer = new float[_new_buffer_length]{0};
+
+                // Copy as much as fits; keep read head alignment to avoid large jumps
+                if (_buffer != nullptr && _buffer_length > 0) {
+                    const uint32_t copyCount = (_new_buffer_length < static_cast<uint32_t>(_buffer_length))
+                                                   ? _new_buffer_length
+                                                   : static_cast<uint32_t>(_buffer_length);
+                    // Copy most recent samples into end of new buffer to minimize click
+                    // Compute start in old buffer
+                    int32_t start = _buffer_position - static_cast<int32_t>(copyCount);
+                    while (start < 0) start += _buffer_length;
+                    for (uint32_t i = 0; i < copyCount; ++i) {
+                        int32_t idx = start + static_cast<int32_t>(i);
+                        if (idx >= _buffer_length) idx -= _buffer_length;
+                        _new_buffer[_new_buffer_length - copyCount + i] = _buffer[idx];
+                    }
+                    // Position read at start of newest segment
+                    _buffer_position = (_new_buffer_length - copyCount);
+                } else {
+                    _buffer_position = 0;
                 }
-                fAllocatedBuffer = true;
-                fBuffer          = mNewBuffer;
-                fBufferLength    = mNewBufferLength;
+
+                if (_allocated_buffer && _buffer != nullptr) {
+                    delete[] _buffer;
+                }
+                _allocated_buffer = true;
+                _buffer           = _new_buffer;
+                _buffer_length    = _new_buffer_length;
             }
-            fNewEchoLength = -1;
+            _new_echo_length = -1;
         }
     };
 } // namespace klangwellen

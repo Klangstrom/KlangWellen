@@ -1,38 +1,50 @@
-#include "Klangstrom.h"
+#include "Arduino.h"
+#include "System.h"
+#include "Console.h"
+#include "AudioDevice.h"
+#include "Beat.h"
+
 #include "Sampler.h"
 
 using namespace klangwellen;
 
-Sampler fSampler{KlangWellen::DEFAULT_SAMPLING_RATE / 8};
+Sampler sampler(24000, 48000);
+Beat    beat_timer;
 
 void setup() {
-    Serial.begin(115200);
-    Serial.println("----------");
-    Serial.println("07.Sampler");
-    Serial.println("----------");
+    system_init();
+    system_init_audiocodec();
 
-    for (int32_t i = 0; i < fSampler.get_buffer_length(); i++) {
-        float ratio = 1.0 - (float)i / fSampler.get_buffer_length();
-        // fSampler.get_buffer()[i] = KlangWellen::random() * 0.2f * ratio * 127; // for SamplerI8
-        fSampler.get_buffer()[i] = KlangWellen::random() * 0.2f * ratio;
+    console_println("----------");
+    console_println("07.Sampler");
+    console_println("----------");
+
+    for (int32_t i = 0; i < sampler.get_buffer_length(); i++) {
+        float ratio             = 1.0 - (float) i / sampler.get_buffer_length();
+        sampler.get_buffer()[i] = KlangWellen::random() * 0.2f * ratio;
     }
-    klangstrom::beats_per_minute(120 * 4);
+
+    beat_timer.init();
+    beat_timer.set_bpm(120 * 4);
+    beat_timer.start();
 }
 
 void loop() {}
 
-void beat(uint32_t beat_counter) {
+void beat_event(const uint8_t beat_id, const uint16_t beat_counter) {
     if (beat_counter % 2) {
-        fSampler.rewind();
-        fSampler.play();
+        sampler.rewind();
+        sampler.play();
     } else {
-        fSampler.stop();
+        sampler.stop();
     }
 }
 
-void audioblock(float** input_signal, float** output_signal) {
-    for (uint16_t i = 0; i < KLANG_SAMPLES_PER_AUDIO_BLOCK; i++) {
-        output_signal[LEFT][i] = fSampler.process();
+void audioblock(const AudioBlock* audio_block) {
+    for (uint16_t i = 0; i < audio_block->block_size; i++) {
+        audio_block->output[0][i] = sampler.process();
     }
-    KlangWellen::copy(output_signal[LEFT], output_signal[RIGHT]);
+    if (audio_block->output_channels == 2) {
+        KlangWellen::copy(audio_block->output[0], audio_block->output[1], audio_block->block_size);
+    }
 }

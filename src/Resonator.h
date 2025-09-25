@@ -38,8 +38,8 @@
 namespace klangwellen {
     class Resonator {
     public:
-        Resonator()
-            : fFrequency(440.0f), fSampleRate(KlangWellen::DEFAULT_SAMPLE_RATE), fQFactor(1.0f) {
+        Resonator(float sample_rate)
+            : fFrequency(440.0f), fSampleRate(sample_rate), fQFactor(1.0f) {
             calculateCoefficients();
         }
 

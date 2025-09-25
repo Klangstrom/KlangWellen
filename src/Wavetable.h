@@ -29,7 +29,6 @@
 
 #pragma once
 
-#include <cstdint>
 #include <cmath>
 #include <algorithm>
 
@@ -121,11 +120,11 @@ namespace klangwellen {
             const uint32_t q  = wavetable_size / 4;
             const float    qf = static_cast<float>(wavetable_size) * 0.25f;
             for (uint32_t i = 0; i < q; i++) {
-                wavetable[i] = static_cast<float>(i) / qf;
-                // noinspection PointlessArithmeticExpression
-                wavetable[i + (q * 1)] = (qf - static_cast<float>(i)) / qf;
-                wavetable[i + (q * 2)] = static_cast<float>(-i) / qf;
-                wavetable[i + (q * 3)] = -(qf - static_cast<float>(i)) / qf;
+                const float fi       = static_cast<float>(i);
+                wavetable[i]         = fi / qf;
+                wavetable[i + q * 1] = (qf - fi) / qf;
+                wavetable[i + q * 2] = -fi / qf;
+                wavetable[i + q * 3] = -(qf - fi) / qf;
             }
         }
 
@@ -372,7 +371,7 @@ namespace klangwellen {
             const float    tmp     = d + 3.0f * b;
             const float    fracsq  = frac * frac;
             const float    fracb   = frac * fracsq;
-            const float    mOutput = (fracb * (-a - 3.f * c + tmp) / 6.f + fracsq * ((a + c) / 2.f - b) + frac * (c + (-2.f * a - tmp) / 6.f) + b);
+            const float    mOutput = fracb * (-a - 3.f * c + tmp) / 6.f + fracsq * ((a + c) / 2.f - b) + frac * (c + (-2.f * a - tmp) / 6.f) + b;
             advance_array_ptr();
             return mOutput;
         }

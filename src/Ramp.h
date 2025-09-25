@@ -30,80 +30,76 @@
 #pragma once
 
 #include <stdint.h>
-#include <stdio.h>
-
-#include "KlangWellen.h"
-#include "AudioSignal.h"
 
 namespace klangwellen {
     class Ramp {
     public:
-        Ramp(uint32_t sample_rate = KlangWellen::DEFAULT_SAMPLE_RATE) : fSampleRate(sample_rate) {
-            fStartValue   = 0;
-            fEndValue     = 0;
-            fCurrentValue = 0;
-            fDuration     = 0;
-            fIsDone       = true;
+        explicit Ramp(const uint32_t sample_rate) : _sample_rate(sample_rate), _delta_fraction(0) {
+            _start_value   = 0;
+            _end_value     = 0;
+            _current_value = 0;
+            _duration      = 0;
+            _is_done       = true;
         }
 
-        void set_start(float start_value) {
-            fStartValue = start_value;
+        void set_start(const float start_value) {
+            _start_value = start_value;
         }
 
-        void set_end(float end_value) {
-            fEndValue = end_value;
+        void set_end(const float end_value) {
+            _end_value = end_value;
         }
 
         /**
          * duration in sec
          */
-        void set_duration(float duration) {
-            fDuration = duration;
+        void set_duration(const float duration) {
+            _duration = duration;
         }
 
-        void set(float start_value, float end_value, float duration) {
-            fStartValue = start_value;
-            fEndValue   = end_value;
-            fDuration   = duration;
+        void set(const float start_value, const float end_value, const float duration) {
+            _start_value = start_value;
+            _end_value   = end_value;
+            _duration    = duration;
         }
 
         float process() {
-            if (!fIsDone) {
-                fCurrentValue += fDeltaFraction;
-                if (fCurrentValue > fEndValue) {
-                    fCurrentValue = fEndValue;
-                    fIsDone       = true;
+            if (!_is_done) {
+                _current_value += _delta_fraction;
+                if (_current_value > _end_value) {
+                    _current_value = _end_value;
+                    _is_done       = true;
                 }
-                return fCurrentValue;
+                return _current_value;
             }
-            return fEndValue;
+            return _end_value;
         }
 
         void process(float*         signal_buffer,
-                     const uint32_t length = KlangWellen::DEFAULT_AUDIOBLOCK_SIZE) {
+                     const uint32_t length) {
             for (uint32_t i = 0; i < length; i++) {
                 signal_buffer[i] = process();
             }
         }
 
         void start() {
-            const float mDelta = fEndValue - fStartValue;
-            fDeltaFraction     = compute_delta_fraction(mDelta, fDuration);
-            fCurrentValue      = fStartValue;
-            fIsDone            = false;
+            const float mDelta = _end_value - _start_value;
+            _delta_fraction    = compute_delta_fraction(mDelta, _duration);
+            _current_value     = _start_value;
+            _is_done           = false;
         }
 
     private:
-        uint32_t fSampleRate;
-        float    fStartValue;
-        float    fEndValue;
-        float    fCurrentValue;
-        float    fDuration;
-        float    fDeltaFraction;
-        bool     fIsDone;
+        uint32_t _sample_rate;
+        float    _start_value;
+        float    _end_value;
+        float    _current_value;
+        float    _duration;
+        float    _delta_fraction;
+        bool     _is_done;
 
-        float compute_delta_fraction(float pDelta, float pDuration) {
-            return pDuration > 0 ? (pDelta / fSampleRate) / pDuration : pDelta;
+        float compute_delta_fraction(const float delta, const float duration) const {
+            return duration > 0 ? (delta / _sample_rate) / duration : delta;
         }
     };
 } // namespace klangwellen

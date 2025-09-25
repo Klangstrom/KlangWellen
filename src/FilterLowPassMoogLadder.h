@@ -59,8 +59,6 @@ namespace klangwellen {
         float       fTanhstg[3]{};
 
     public:
-        FilterLowPassMoogLadder() : FilterLowPassMoogLadder(KlangWellen::DEFAULT_SAMPLE_RATE) {}
-
         explicit FilterLowPassMoogLadder(const float sample_rate) : fSampleRate(sample_rate), fOldAcr(0), fOldTune(0) {
             fResonance       = 0.4f;
             fCutoffFrequency = 1000.0f;

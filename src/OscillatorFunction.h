@@ -34,7 +34,7 @@
 namespace klangwellen {
     class OscillatorFunction {
     public:
-        explicit OscillatorFunction(const uint32_t sample_rate = KlangWellen::DEFAULT_SAMPLE_RATE) : mSamplingRate(sample_rate) {
+        explicit OscillatorFunction(const uint32_t sample_rate) : mSamplingRate(sample_rate) {
             mWaveform = KlangWellen::WAVEFORM_SINE;
             set_frequency(DEFAULT_FREQUENCY);
             set_amplitude(DEFAULT_AMPLITUDE);

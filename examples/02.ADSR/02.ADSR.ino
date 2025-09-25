@@ -28,7 +28,7 @@ void setup() {
     adsr.set_sustain(0.5f);
     adsr.set_release(0.5f);
 
-    beat_timer.init(7);
+    beat_timer.init();
     beat_timer.set_bpm(60);
     beat_timer.start();
 }
