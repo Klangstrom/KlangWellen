@@ -23,11 +23,14 @@
  * - [ ] float process()
  * - [x] float process(float)
  * - [x] void process(AudioSignal&)
+ * - [x] void process(float&, float)
  * - [ ] void process(float*, uint32_t)
  * - [x] void process(float*, float*, uint32_t)
  */
 
 #pragma once
+
+#include <cstdint>
 
 #include "AudioSignal.h"
 
@@ -137,7 +140,7 @@ namespace klangwellen {
 
         void process(float*         output_signal_left,
                      float*         output_signal_right,
-                     const uint32_t buffer_length = Klangwellen::DEFAULT_AUDIOBLOCK_SIZE) {
+                     const uint32_t buffer_length) {
             process(output_signal_left,
                     output_signal_right,
                     output_signal_left, output_signal_right, buffer_length);
@@ -145,9 +148,9 @@ namespace klangwellen {
 
         void process(float*         output_signal_left,
                      float*         output_signal_right,
-                     float*         input_signal_left,
-                     float*         input_signal_right,
-                     const uint32_t buffer_length = Klangwellen::DEFAULT_AUDIOBLOCK_SIZE) {
+                     const float*   input_signal_left,
+                     const float*   input_signal_right,
+                     const uint32_t buffer_length) {
             fslider0 = damp.get();
             fslider1 = roomSize.get();
             fslider2 = wet.get();
@@ -282,6 +285,13 @@ namespace klangwellen {
                 IOTA     = IOTA + 1;
                 fRec9_1  = fRec9_0;
             }
+        }
+
+        void process(float& left, float& right) {
+            AudioSignal signal(left, right);
+            process(signal);
+            left  = signal.left;
+            right = signal.right;
         }
 
         void process(AudioSignal& signal) {

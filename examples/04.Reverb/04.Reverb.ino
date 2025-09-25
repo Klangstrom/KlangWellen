@@ -1,51 +1,67 @@
+#include "Arduino.h"
+#include "System.h"
+#include "Console.h"
+#include "AudioDevice.h"
+#include "Beat.h"
+
 #include "ADSR.h"
-#include "Klangstrom.h"
 #include "Reverb.h"
 #include "Wavetable.h"
+#include "AudioSignal.h"
 
-using namespace klangstrom;
 using namespace klangwellen;
 
-Wavetable fWavetable;
-ADSR      fADSR;
-Reverb    fReverb;
+Wavetable wavetable(256, 48000);
+ADSR      adsr(48000);
+Reverb    reverb;
+Beat      beat_timer;
 
 void setup() {
-    Serial.begin(115200);
-    Serial.println("---------");
-    Serial.println("04.Reverb");
-    Serial.println("---------");
+    system_init();
+    system_init_audiocodec();
 
-    fWavetable.set_waveform(Klangwellen::WAVEFORM_SINE);
-    fReverb.set_roomsize(0.9);
+    console_println("---------");
+    console_println("04.Reverb");
+    console_println("---------");
+
+    wavetable.set_waveform(Klangwellen::WAVEFORM_SINE);
+    reverb.set_roomsize(0.9);
+
+    beat_timer.init();
+    beat_timer.set_bpm(60);
+    beat_timer.start();
 }
 
 void loop() {}
 
-void beat(uint32_t beat_counter) {
+void beat_event(const uint8_t beat_id, const uint16_t beat_counter) {
     if (beat_counter % 2) {
-        fADSR.start();
+        adsr.start();
     } else {
-        fADSR.stop();
+        adsr.stop();
     }
 }
 
-void audioblock(float** input_signal, float** output_signal) {
-    for (uint16_t i = 0; i < KLANG_SAMPLES_PER_AUDIO_BLOCK; i++) {
-        // /* process as signal ( stereo, single sample ) ... */
-        // const float mono_signal = fWavetable.process() * fADSR.process();
-        // Signal      stereo_signal(mono_signal);
-        // fReverb.process(stereo_signal);
-        // output_signal[LEFT][i]  = stereo_signal.left;
-        // output_signal[RIGHT][i] = stereo_signal.right;
-
-        // /* ... or as float ( mono, single sample ) ... */
-        // output_signal[LEFT][i]  = fReverb.process(fADSR.process(fWavetable.process()));
-        // output_signal[RIGHT][i] = output_signal[LEFT][i];
+void audioblock(const AudioBlock* audio_block) {
+    for (int i = 0; i < audio_block->block_size; ++i) {
+        float sample = wavetable.process();
+        sample *= adsr.process();
+        /* mono */
+        if (audio_block->output_channels == 1) {
+            audio_block->output[0][i] = reverb.process(sample);
+        }
+        /* stereo */
+        if (audio_block->output_channels == 2) {
+            float left  = sample;
+            float right = sample;
+            reverb.process(left, right);
+            audio_block->output[0][i] = left;
+            audio_block->output[1][i] = right;
+            // "same stereo signal using 'AudioSignal'"
+            // AudioSignal stereo_signal(sample);
+            // reverb.process(stereo_signal);
+            // audio_block->output[0][i] = stereo_signal.left;
+            // audio_block->output[1][i] = stereo_signal.right;
+        }
     }
-    /* ... or as block ( stereo, fastest ) */
-    fWavetable.process(output_signal[LEFT]);
-    fADSR.process(output_signal[LEFT]);
-    Klangwellen::copy(output_signal[LEFT], output_signal[RIGHT]);
-    fReverb.process(output_signal[LEFT], output_signal[RIGHT]);
 }

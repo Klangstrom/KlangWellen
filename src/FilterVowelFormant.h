@@ -32,7 +32,6 @@
 #include <stdint.h>
 
 #include "Klangwellen.h"
-#include "AudioSignal.h"
 
 namespace klangwellen {
     class FilterVowelFormant {
@@ -43,12 +42,12 @@ namespace klangwellen {
          * Good for spectral rich input like saw or square
          */
     public:
-        static const uint8_t VOWEL_A       = 0;
-        static const uint8_t VOWEL_E       = 1;
-        static const uint8_t VOWEL_I       = 2;
-        static const uint8_t VOWEL_O       = 3;
-        static const uint8_t VOWEL_U       = 4;
-        static const uint8_t NUM_OF_VOWELS = 5;
+        static constexpr uint8_t VOWEL_A       = 0;
+        static constexpr uint8_t VOWEL_E       = 1;
+        static constexpr uint8_t VOWEL_I       = 2;
+        static constexpr uint8_t VOWEL_O       = 3;
+        static constexpr uint8_t VOWEL_U       = 4;
+        static constexpr uint8_t NUM_OF_VOWELS = 5;
 
         FilterVowelFormant() {
             set_vowel(VOWEL_A);
@@ -61,53 +60,71 @@ namespace klangwellen {
             }
         }
 
-        float process(float signal) {
-            double mSignal = (mCoeff[0] * signal +
-                              mCoeff[1] * memory[0] +
-                              mCoeff[2] * memory[1] +
-                              mCoeff[3] * memory[2] +
-                              mCoeff[4] * memory[3] +
-                              mCoeff[5] * memory[4] +
-                              mCoeff[6] * memory[5] +
-                              mCoeff[7] * memory[6] +
-                              mCoeff[8] * memory[7] +
-                              mCoeff[9] * memory[8] +
-                              mCoeff[10] * memory[9]);
-            memory[9]      = memory[8];
-            memory[8]      = memory[7];
-            memory[7]      = memory[6];
-            memory[6]      = memory[5];
-            memory[5]      = memory[4];
-            memory[4]      = memory[3];
-            memory[3]      = memory[2];
-            memory[2]      = memory[1];
-            memory[1]      = memory[0];
-            memory[0]      = mSignal;
-            return (float) mSignal;
+        float process(const float signal) {
+            // Apply smoothed coefficients to avoid instant jumps
+            for (uint8_t i = 0; i < NUM_OF_COEFFS; ++i) {
+                // one-pole smoothing: mCoeffSmoothed += coeffSlew * (mCoeffTarget - mCoeffSmoothed)
+                mCoeffSmoothed[i] += mCoeffSlew * (mCoeffTarget[i] - mCoeffSmoothed[i]);
+            }
+
+            const double mSignal = (mCoeffSmoothed[0] * signal +
+                                    mCoeffSmoothed[1] * memory[0] +
+                                    mCoeffSmoothed[2] * memory[1] +
+                                    mCoeffSmoothed[3] * memory[2] +
+                                    mCoeffSmoothed[4] * memory[3] +
+                                    mCoeffSmoothed[5] * memory[4] +
+                                    mCoeffSmoothed[6] * memory[5] +
+                                    mCoeffSmoothed[7] * memory[6] +
+                                    mCoeffSmoothed[8] * memory[7] +
+                                    mCoeffSmoothed[9] * memory[8] +
+                                    mCoeffSmoothed[10] * memory[9]);
+
+            // Denormal protection: zero-out extremely small values
+            const double out = (mSignal > 1e-30 || mSignal < -1e-30) ? mSignal : 0.0;
+
+            memory[9] = memory[8];
+            memory[8] = memory[7];
+            memory[7] = memory[6];
+            memory[6] = memory[5];
+            memory[5] = memory[4];
+            memory[4] = memory[3];
+            memory[3] = memory[2];
+            memory[2] = memory[1];
+            memory[1] = memory[0];
+            memory[0] = out;
+
+            return static_cast<float>(out);
         }
 
-        void lerp_vowel(uint8_t vowelA, uint8_t vowelB, double lerp) {
+        void lerp_vowel(const uint8_t vowelA, const uint8_t vowelB, const double lerp) {
             const double b = clamp(lerp, 0.0, 1.0);
             const double a = 1.0 - b;
             for (uint8_t i = 0; i < NUM_OF_COEFFS; i++) {
-                mCoeff[i] = coeff[vowelA][i] * a + coeff[vowelB][i] * b;
+                // Write to targets instead of directly used coeffs
+                mCoeffTarget[i] = coeff[vowelA][i] * a + coeff[vowelB][i] * b;
             }
-            // clearMemory();
+            // Optional: if the jump is large, increase slew speed temporarily (simple heuristic)
+            // double jump = fabs(mCoeffTarget[0] - mCoeffSmoothed[0]);
+            // if (jump > 0.5) mCoeffSlew = fastSlew;
         }
 
-        void set_vowel(uint8_t vowel) {
+        void set_vowel(const uint8_t vowel) {
             for (uint8_t i = 0; i < NUM_OF_COEFFS; i++) {
-                mCoeff[i] = coeff[vowel][i];
+                mCoeffTarget[i]   = coeff[vowel][i];
+                mCoeffSmoothed[i] = coeff[vowel][i];
             }
             clearMemory();
         }
 
     private:
-        static const uint8_t NUM_OF_COEFFS = 11;
-        static const uint8_t MEM_SIZE      = 10;
-        double               memory[MEM_SIZE];
-        double               mCoeff[NUM_OF_COEFFS];
-        const double         coeff[NUM_OF_VOWELS][NUM_OF_COEFFS] = {
+        static constexpr uint8_t NUM_OF_COEFFS = 11;
+        static constexpr uint8_t MEM_SIZE      = 10;
+        double                   memory[MEM_SIZE];
+        double                   mCoeffSmoothed[NUM_OF_COEFFS];
+        double                   mCoeffTarget[NUM_OF_COEFFS];
+        double                   mCoeffSlew = 0.002; // ~5–20 ms smoothing depending on sample rate and call rate
+        // double                fastSlew  = 0.02;  // optional faster slew for large jumps
+        const double coeff[NUM_OF_VOWELS][NUM_OF_COEFFS] = {
             {
                 8.11044e-06, 8.943665402,
                 -36.83889529, 92.01697887,
@@ -155,8 +172,23 @@ namespace klangwellen {
             }
         }
 
-        double clamp(const double value, const double min, const double max) {
+        static double clamp(const double value, const double min, const double max) {
             return value > max ? max : (value < min ? min : value);
+        }
+
+        static double sanitize(double x) {
+            // Zero subnormals (optional)
+            if (std::fpclassify(x) == FP_SUBNORMAL) return 0.0;
+
+            // Fast NaN/Inf detect: !(x == x) catches NaN; !std::isfinite(x) also catches Inf
+            if (!std::isfinite(x)) return 0.0;
+
+            // Clamp to reasonable bounds to avoid runaway values
+            constexpr double kLimit = 1.0e10;
+            if (x > kLimit) return kLimit;
+            if (x < -kLimit) return -kLimit;
+
+            return x;
         }
     };
 } // namespace klangwellen
