@@ -1,35 +1,54 @@
+#include "Arduino.h"
+#include "System.h"
+#include "Console.h"
+#include "AudioDevice.h"
+#include "Beat.h"
+
 #include "ADSR.h"
-#include "Klangstrom.h"
 #include "Wavetable.h"
 
-using namespace klangstrom;
 using namespace klangwellen;
 
-Wavetable fWavetable;
-ADSR      fADSR;
+Wavetable wavetable(256, 48000);
+ADSR      adsr(48000);
+Beat      beat_timer;
 
 void setup() {
-    Serial.begin(115200);
-    Serial.println("-------");
-    Serial.println("02.ADSR");
-    Serial.println("-------");
+    system_init();
+    system_init_audiocodec();
 
-    fWavetable.set_waveform(Klangwellen::WAVEFORM_SINE);
+    console_println("-------");
+    console_println("02.ADSR");
+    console_println("-------");
+
+    wavetable.set_waveform(Klangwellen::WAVEFORM_SINE);
+
+    adsr.set_attack(0.25f);
+    adsr.set_decay(0.125f);
+    adsr.set_sustain(0.5f);
+    adsr.set_release(0.5f);
+
+    beat_timer.init(7);
+    beat_timer.set_bpm(60);
+    beat_timer.start();
 }
 
 void loop() {}
 
-void beat(uint32_t beat_counter) {
+void beat_event(const uint8_t beat_id, const uint16_t beat_counter) {
     if (beat_counter % 2) {
-        fADSR.start();
+        adsr.start();
     } else {
-        fADSR.stop();
+        adsr.stop();
     }
 }
 
-void audioblock(float** input_signal, float** output_signal) {
-    for (uint16_t i = 0; i < KLANG_SAMPLES_PER_AUDIO_BLOCK; i++) {
-        output_signal[LEFT][i] = fWavetable.process() * fADSR.process();
+void audioblock(const AudioBlock* audio_block) {
+    for (int i = 0; i < audio_block->block_size; ++i) {
+        const float sample        = wavetable.process() * adsr.process();
+        audio_block->output[0][i] = sample;
     }
-    Klangwellen::copy(output_signal[LEFT], output_signal[RIGHT]);
+    if (audio_block->output_channels == 2) {
+        Klangwellen::copy(audio_block->output[0], audio_block->output[1], audio_block->block_size);
+    }
 }

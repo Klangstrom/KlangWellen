@@ -35,7 +35,6 @@
 
 #include "Klangwellen.h"
 
-
 /**
  * plays back a chunk of samples ( i.e arbitrary, single-cycle waveform like sine, triangle, saw or square waves ) at
  * different frequencies and amplitudes.
@@ -49,23 +48,22 @@ namespace klangwellen {
 
         Wavetable(float* wavetable, const uint32_t wavetable_size, const uint32_t sampling_rate) : mWavetableSize(wavetable_size),
                                                                                                    mSamplingRate(sampling_rate),
-                                                                                                   mFrequency(M_DEFAULT_FREQUENCY),
                                                                                                    fInterpolationType(Klangwellen::WAVESHAPE_INTERPOLATE_NONE) {
-            mWavetable                = wavetable;
+            _wavetable                = wavetable;
             fDeleteWavetable          = false;
             mArrayPtr                 = 0;
             mJitterRange              = 0.0f;
-            mAmplitude                = M_DEFAULT_AMPLITUDE;
             mPhaseOffset              = 0.0f;
             mDesiredAmplitude         = 0.0f;
             mDesiredAmplitudeFraction = 0.0f;
             mDesiredAmplitudeSteps    = 0;
             set_frequency(M_DEFAULT_FREQUENCY);
+            set_amplitude(M_DEFAULT_AMPLITUDE);
         }
 
         ~Wavetable() {
             if (fDeleteWavetable) {
-                delete[] mWavetable;
+                delete[] _wavetable;
             }
         }
 
@@ -132,7 +130,7 @@ namespace klangwellen {
         }
 
         void set_waveform(const uint8_t waveform) const {
-            fill(mWavetable, mWavetableSize, waveform);
+            fill(_wavetable, mWavetableSize, waveform);
         }
 
         float get_frequency() const {
@@ -208,7 +206,7 @@ namespace klangwellen {
         }
 
         float* get_wavetable() const {
-            return mWavetable;
+            return _wavetable;
         }
 
         uint32_t get_wavetable_size() const {
@@ -318,7 +316,7 @@ namespace klangwellen {
         static constexpr float TWO_PIf             = (float) TWO_PI;
         static constexpr float M_DEFAULT_AMPLITUDE = 0.75f;
         static constexpr float M_DEFAULT_FREQUENCY = 220.0f;
-        float*                 mWavetable;
+        float*                 _wavetable;
         const uint32_t         mWavetableSize;
         const uint32_t         mSamplingRate;
         bool                   fDeleteWavetable;
@@ -355,7 +353,7 @@ namespace klangwellen {
         }
 
         float next_sample() {
-            const float mOutput = mWavetable[static_cast<int>(mArrayPtr)];
+            const float mOutput = _wavetable[static_cast<int>(mArrayPtr)];
             advance_array_ptr();
             return mOutput;
         }
@@ -365,12 +363,12 @@ namespace klangwellen {
             const float    mArrayPtrOffset = mArrayPtr + mSampleOffset;
             /* cubic interpolation */
             const float    frac    = mArrayPtrOffset - static_cast<int>(mArrayPtrOffset);
-            const float    a       = static_cast<int>(mArrayPtrOffset) > 0 ? mWavetable[static_cast<int>(mArrayPtrOffset) - 1] : mWavetable[mWavetableSize - 1];
-            const float    b       = mWavetable[static_cast<int>(mArrayPtrOffset) % mWavetableSize];
+            const float    a       = static_cast<int>(mArrayPtrOffset) > 0 ? _wavetable[static_cast<int>(mArrayPtrOffset) - 1] : _wavetable[mWavetableSize - 1];
+            const float    b       = _wavetable[static_cast<int>(mArrayPtrOffset) % mWavetableSize];
             const uint32_t p1      = static_cast<uint32_t>(mArrayPtrOffset) + 1;
-            const float    c       = mWavetable[p1 >= mWavetableSize ? p1 - mWavetableSize : p1];
+            const float    c       = _wavetable[p1 >= mWavetableSize ? p1 - mWavetableSize : p1];
             const uint32_t p2      = static_cast<uint32_t>(mArrayPtrOffset) + 2;
-            const float    d       = mWavetable[p2 >= mWavetableSize ? p2 - mWavetableSize : p2];
+            const float    d       = _wavetable[p2 >= mWavetableSize ? p2 - mWavetableSize : p2];
             const float    tmp     = d + 3.0f * b;
             const float    fracsq  = frac * frac;
             const float    fracb   = frac * fracsq;
@@ -384,12 +382,12 @@ namespace klangwellen {
             const float    mArrayPtrOffset = mArrayPtr + mSampleOffset;
             /* linear interpolation */
             const float    mFrac   = mArrayPtrOffset - static_cast<int>(mArrayPtrOffset);
-            const float    a       = mWavetable[static_cast<int>(mArrayPtrOffset)];
+            const float    a       = _wavetable[static_cast<int>(mArrayPtrOffset)];
             const uint32_t p1      = static_cast<uint32_t>(mArrayPtrOffset) + 1;
-            const float    b       = mWavetable[p1 >= mWavetableSize ? p1 - mWavetableSize : p1];
+            const float    b       = _wavetable[p1 >= mWavetableSize ? p1 - mWavetableSize : p1];
             const float    mOutput = a + mFrac * (b - a);
             advance_array_ptr();
             return mOutput;
         }
     };
-}
+} // namespace klangwellen

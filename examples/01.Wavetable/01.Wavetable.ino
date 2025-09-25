@@ -1,27 +1,36 @@
+#include "Arduino.h"
+#include "System.h"
+#include "Console.h"
+#include "AudioDevice.h"
+
 #include "Klangwellen.h"
-#include "Klangstrom.h"
 #include "Wavetable.h"
 
 using namespace klangwellen;
 
-Wavetable fWavetable;
+Wavetable wavetable(256, 48000);
 
 void setup() {
-    Serial.begin(115200);
-    Serial.println("------------");
-    Serial.println("01.Wavetable");
-    Serial.println("------------");
+    system_init();
+    system_init_audiocodec();
 
-    fWavetable.set_waveform(Klangwellen::WAVEFORM_SAWTOOTH, 16);
-    fWavetable.set_frequency(55);
-    fWavetable.set_amplitude(0.5);
+    console_println("------------");
+    console_println("01.Wavetable");
+    console_println("------------");
+
+    wavetable.set_waveform(Klangwellen::WAVEFORM_SAWTOOTH);
+    wavetable.set_frequency(55);
+    wavetable.set_amplitude(0.5);
 }
 
 void loop() {}
 
-void audioblock(float** input_signal, float** output_signal) {
-    for (uint16_t i = 0; i < KLANG_SAMPLES_PER_AUDIO_BLOCK; i++) {
-        output_signal[LEFT][i] = fWavetable.process();
+void audioblock(const AudioBlock* audio_block) {
+    for (int i = 0; i < audio_block->block_size; ++i) {
+        const float sample        = wavetable.process();
+        audio_block->output[0][i] = sample;
     }
-    Klangwellen::copy(output_signal[LEFT], output_signal[RIGHT]);
+    if (audio_block->output_channels == 2) {
+        Klangwellen::copy(audio_block->output[0], audio_block->output[1], audio_block->block_size);
+    }
 }

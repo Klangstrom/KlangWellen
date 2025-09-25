@@ -75,7 +75,7 @@ namespace klangwellen {
         }
 
         void process(float*         signal_buffer,
-                     const uint32_t length = Klangwellen::DEFAULT_AUDIOBLOCK_SIZE) {
+                     const uint32_t length) {
             for (uint32_t i = 0; i < length; i++) {
                 signal_buffer[i] = process(signal_buffer[i]);
             }
