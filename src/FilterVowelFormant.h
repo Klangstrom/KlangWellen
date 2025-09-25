@@ -33,6 +33,8 @@
 
 #include "Klangwellen.h"
 
+#define KW_FILTER_VOWEL_FORMANT_SANITIZE_OUTPUT
+
 namespace klangwellen {
     class FilterVowelFormant {
         /*
@@ -93,7 +95,12 @@ namespace klangwellen {
             memory[1] = memory[0];
             memory[0] = out;
 
+#ifdef KW_FILTER_VOWEL_FORMANT_SANITIZE_OUTPUT
+            const float output_sample = sanitize(static_cast<float>(out));
+            return output_sample;
+#else
             return static_cast<float>(out);
+#endif
         }
 
         void lerp_vowel(const uint8_t vowelA, const uint8_t vowelB, const double lerp) {
@@ -176,7 +183,7 @@ namespace klangwellen {
             return value > max ? max : (value < min ? min : value);
         }
 
-        static double sanitize(double x) {
+        static double sanitize(const double x) {
             // Zero subnormals (optional)
             if (std::fpclassify(x) == FP_SUBNORMAL) return 0.0;
 
