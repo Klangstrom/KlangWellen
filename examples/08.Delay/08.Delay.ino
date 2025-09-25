@@ -2,7 +2,7 @@
 
 #include "ADSR.h"
 #include "Delay.h"
-#include "Klangwellen.h"
+#include "KlangWellen.h"
 #include "Klangstrom.h"
 #include "Wavetable.h"
 
@@ -19,7 +19,7 @@ void setup() {
     Serial.println("08.Delay");
     Serial.println("--------");
 
-    fWavetable.set_waveform(Klangwellen::WAVEFORM_TRIANGLE);
+    fWavetable.set_waveform(KlangWellen::WAVEFORM_TRIANGLE);
     fWavetable.set_amplitude(0.4);
     fDelay.set_echo_length(0.05);
     fDelay.set_decay_rate(0.7);
@@ -50,5 +50,5 @@ void audioblock(float** input_signal, float** output_signal) {
     fWavetable.process(output_signal[LEFT]);
     fADSR.process(output_signal[LEFT]);
     fDelay.process(output_signal[LEFT]);
-    Klangwellen::copy(output_signal[LEFT], output_signal[RIGHT]);
+    KlangWellen::copy(output_signal[LEFT], output_signal[RIGHT]);
 }

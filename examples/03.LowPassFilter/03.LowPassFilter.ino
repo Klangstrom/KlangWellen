@@ -21,7 +21,7 @@ void setup() {
     console_println("03.LowPassFilter");
     console_println("----------------");
 
-    wavetable.set_waveform(Klangwellen::WAVEFORM_SQUARE);
+    wavetable.set_waveform(KlangWellen::WAVEFORM_SQUARE);
     wavetable.set_frequency(55);
     low_pass_filter.set_resonance(0.85f);
 
@@ -47,6 +47,6 @@ void audioblock(const AudioBlock* audio_block) {
     // }
 
     if (audio_block->output_channels == 2) {
-        Klangwellen::copy(audio_block->output[0], audio_block->output[1], audio_block->block_size);
+        KlangWellen::copy(audio_block->output[0], audio_block->output[1], audio_block->block_size);
     }
 }

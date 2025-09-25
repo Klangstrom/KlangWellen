@@ -21,7 +21,7 @@ void setup() {
     console_println("05.FormantFilter");
     console_println("----------------");
 
-    wavetable.set_waveform(Klangwellen::WAVEFORM_SAWTOOTH);
+    wavetable.set_waveform(KlangWellen::WAVEFORM_SAWTOOTH);
     wavetable.set_frequency(35);
     wavetable.set_amplitude(0.125f);
     vowel_filter.set_vowel(FilterVowelFormant::VOWEL_U);
@@ -47,13 +47,13 @@ void beat_event(const uint8_t beat_id, const uint16_t beat_counter) {
 // void audioblock(float** input_signal, float** output_signal) {
 //     wavetable.process(output_signal[LEFT]);
 //     vowel_filter.process(output_signal[LEFT]);
-//     Klangwellen::copy(output_signal[LEFT], output_signal[RIGHT]);
+//     KlangWellen::copy(output_signal[LEFT], output_signal[RIGHT]);
 // }
 
 void audioblock(const AudioBlock* audio_block) {
     wavetable.process(audio_block->output[0], audio_block->block_size);
     vowel_filter.process(audio_block->output[0], audio_block->block_size);
     if (audio_block->output_channels == 2) {
-        Klangwellen::copy(audio_block->output[0], audio_block->output[1], audio_block->block_size);
+        KlangWellen::copy(audio_block->output[0], audio_block->output[1], audio_block->block_size);
     }
 }

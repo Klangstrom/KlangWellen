@@ -14,7 +14,7 @@ void setup() {
     Serial.println("17.Waveshaper");
     Serial.println("-------------");
 
-    fWavetable.set_waveform(Klangwellen::WAVEFORM_SINE);
+    fWavetable.set_waveform(KlangWellen::WAVEFORM_SINE);
     fWavetable.set_amplitude(4.0);
     fWavetable.set_frequency(55);
 
@@ -38,5 +38,5 @@ void beat(uint32_t beat_counter) {
 void audioblock(float** input_signal, float** output_signal) {
     fWavetable.process(output_signal[LEFT]);
     fWaveshaper.process(output_signal[LEFT]);
-    Klangwellen::copy(output_signal[LEFT], output_signal[RIGHT]);
+    KlangWellen::copy(output_signal[LEFT], output_signal[RIGHT]);
 }

@@ -13,7 +13,7 @@ void setup() {
     Serial.println("14.Filters");
     Serial.println("----------");
 
-    fWavetable.set_waveform(Klangwellen::WAVEFORM_SQUARE);
+    fWavetable.set_waveform(KlangWellen::WAVEFORM_SQUARE);
     fWavetable.set_frequency(55);
     klangstrom::beats_per_minute(120 * 4);
 }
@@ -30,5 +30,5 @@ void beat(uint32_t beat_counter) {
 void audioblock(float** input_signal, float** output_signal) {
     fWavetable.process(output_signal[LEFT]);
     fFilter.process(output_signal[LEFT]);
-    Klangwellen::copy(output_signal[LEFT], output_signal[RIGHT]);
+    KlangWellen::copy(output_signal[LEFT], output_signal[RIGHT]);
 }

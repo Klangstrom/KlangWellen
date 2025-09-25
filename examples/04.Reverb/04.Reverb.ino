@@ -24,7 +24,7 @@ void setup() {
     console_println("04.Reverb");
     console_println("---------");
 
-    wavetable.set_waveform(Klangwellen::WAVEFORM_SINE);
+    wavetable.set_waveform(KlangWellen::WAVEFORM_SINE);
     reverb.set_roomsize(0.9);
 
     beat_timer.init();

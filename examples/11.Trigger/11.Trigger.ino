@@ -19,14 +19,14 @@ void setup() {
     Serial.println("11.Trigger");
     Serial.println("----------");
 
-    fWavetable.set_waveform(Klangwellen::WAVEFORM_SINE);
+    fWavetable.set_waveform(KlangWellen::WAVEFORM_SINE);
     fWavetable.set_frequency(220.0);
-    fWavetable_DSP.set_waveform(Klangwellen::WAVEFORM_TRIANGLE);
+    fWavetable_DSP.set_waveform(KlangWellen::WAVEFORM_TRIANGLE);
     fWavetable_DSP.set_frequency(110.0);
 
     const static uint8_t pulses_per_beat = 4;
 
-    fLFO.set_waveform(Klangwellen::WAVEFORM_SINE);
+    fLFO.set_waveform(KlangWellen::WAVEFORM_SINE);
     fLFO.set_frequency(pulses_per_beat);
 
     fTrigger.trigger_rising_edge(true);

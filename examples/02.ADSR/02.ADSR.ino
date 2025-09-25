@@ -21,7 +21,7 @@ void setup() {
     console_println("02.ADSR");
     console_println("-------");
 
-    wavetable.set_waveform(Klangwellen::WAVEFORM_SINE);
+    wavetable.set_waveform(KlangWellen::WAVEFORM_SINE);
 
     adsr.set_attack(0.25f);
     adsr.set_decay(0.125f);
@@ -49,6 +49,6 @@ void audioblock(const AudioBlock* audio_block) {
         audio_block->output[0][i] = sample;
     }
     if (audio_block->output_channels == 2) {
-        Klangwellen::copy(audio_block->output[0], audio_block->output[1], audio_block->block_size);
+        KlangWellen::copy(audio_block->output[0], audio_block->output[1], audio_block->block_size);
     }
 }

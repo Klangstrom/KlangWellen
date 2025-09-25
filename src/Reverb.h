@@ -23,7 +23,7 @@
  * - [ ] float process()
  * - [x] float process(float)
  * - [x] void process(AudioSignal&)
- * - [x] void process(float&, float)
+ * - [x] void process(float&, float&)
  * - [ ] void process(float*, uint32_t)
  * - [x] void process(float*, float*, uint32_t)
  */

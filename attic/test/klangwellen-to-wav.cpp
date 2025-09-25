@@ -7,20 +7,20 @@
 #include <iostream>
 
 #include "ADSR.h"
-#include "Klangwellen.h"
+#include "KlangWellen.h"
 #include "Reverb.h"
 #include "Wavetable.h"
 #include "utilities.h"
 
 klangwellen::ADSR      fADSR;
-klangwellen::Wavetable fWavetable(1024, klangwellen::Klangwellen::DEFAULT_SAMPLE_RATE);
+klangwellen::Wavetable fWavetable(1024, klangwellen::KlangWellen::DEFAULT_SAMPLE_RATE);
 klangwellen::Reverb    fReverb;
 
-static const int mNumSamples = klangwellen::Klangwellen::DEFAULT_SAMPLE_RATE * 4; // 4 seconds
+static const int mNumSamples = klangwellen::KlangWellen::DEFAULT_SAMPLE_RATE * 4; // 4 seconds
 float            mAudioBuffer[mNumSamples];
 
 int main() {
-    std::cout << "SAMPLE_RATE .... : " << klangwellen::Klangwellen::DEFAULT_SAMPLE_RATE << std::endl;
+    std::cout << "SAMPLE_RATE .... : " << klangwellen::KlangWellen::DEFAULT_SAMPLE_RATE << std::endl;
     std::cout << "NUM OF SAMPLES ... : " << mNumSamples << std::endl;
 
     klangwellen::Wavetable::sawtooth(fWavetable.get_wavetable(), fWavetable.get_wavetable_size(), 5);
@@ -29,7 +29,7 @@ int main() {
     bool mToggleADSR = false;
     fADSR.start();
     for (size_t i = 0; i < mNumSamples; i++) {
-        if (i % (klangwellen::Klangwellen::DEFAULT_SAMPLE_RATE / 4) == 0) {
+        if (i % (klangwellen::KlangWellen::DEFAULT_SAMPLE_RATE / 4) == 0) {
             mToggleADSR = !mToggleADSR;
             if (mToggleADSR) {
                 fADSR.start();
@@ -46,7 +46,7 @@ int main() {
     std::cout << std::endl;
 
     write_WAV_file("klangwellen-to-wav.wav",
-                   klangwellen::Klangwellen::DEFAULT_SAMPLE_RATE,
+                   klangwellen::KlangWellen::DEFAULT_SAMPLE_RATE,
                    1,
                    mAudioBuffer,
                    mNumSamples);

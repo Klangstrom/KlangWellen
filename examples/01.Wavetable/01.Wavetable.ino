@@ -3,7 +3,7 @@
 #include "Console.h"
 #include "AudioDevice.h"
 
-#include "Klangwellen.h"
+#include "KlangWellen.h"
 #include "Wavetable.h"
 
 using namespace klangwellen;
@@ -18,7 +18,7 @@ void setup() {
     console_println("01.Wavetable");
     console_println("------------");
 
-    wavetable.set_waveform(Klangwellen::WAVEFORM_SAWTOOTH);
+    wavetable.set_waveform(KlangWellen::WAVEFORM_SAWTOOTH);
     wavetable.set_frequency(55);
     wavetable.set_amplitude(0.5);
 }
@@ -31,6 +31,6 @@ void audioblock(const AudioBlock* audio_block) {
         audio_block->output[0][i] = sample;
     }
     if (audio_block->output_channels == 2) {
-        Klangwellen::copy(audio_block->output[0], audio_block->output[1], audio_block->block_size);
+        KlangWellen::copy(audio_block->output[0], audio_block->output[1], audio_block->block_size);
     }
 }

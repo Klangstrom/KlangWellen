@@ -14,10 +14,10 @@ void setup() {
     Serial.println("09.LFO");
     Serial.println("------");
 
-    fLFO.set_waveform(Klangwellen::WAVEFORM_SINE);
+    fLFO.set_waveform(KlangWellen::WAVEFORM_SINE);
     fLFO.set_oscillation_range(55, 1000);
     fLFO.set_frequency(0.5);
-    fWavetable.set_waveform(Klangwellen::WAVEFORM_SQUARE);
+    fWavetable.set_waveform(KlangWellen::WAVEFORM_SQUARE);
     fWavetable.set_frequency(27.5);
     fFilter.set_resonance(0.85f);
 }
@@ -33,5 +33,5 @@ void audioblock(float** input_signal, float** output_signal) {
         fFilter.set_frequency(fLFO.process());
         output_signal[LEFT][i] = fFilter.process(fWavetable.process());
     }
-    Klangwellen::copy(output_signal[LEFT], output_signal[RIGHT]);
+    KlangWellen::copy(output_signal[LEFT], output_signal[RIGHT]);
 }
