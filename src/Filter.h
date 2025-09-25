@@ -1,7 +1,7 @@
 /*
- * Klangwellen
+ * KlangWellen
  *
- * This file is part of the *Klangwellen* library (https://github.com/dennisppaul/klangwellen).
+ * This file is part of the *KlangWellen* library (https://github.com/dennisppaul/klangwellen).
  * Copyright (c) 2025 Dennis P Paul
  *
  * This library is free software: you can redistribute it and/or modify
@@ -31,7 +31,7 @@
 
 #include <stdint.h>
 
-#include "Klangwellen.h"
+#include "KlangWellen.h"
 
 namespace klangwellen {
     class Filter {
@@ -47,7 +47,7 @@ namespace klangwellen {
         static const uint8_t NUM_FILTER_TYPES = 7;
 
         Filter(bool use_fast_math = true) : __USE_FAST_TRIG(use_fast_math) {
-            set(LPF, 0.0, 1000, 100, Klangwellen::DEFAULT_SAMPLE_RATE);
+            set(LPF, 0.0, 1000, 100, KlangWellen::DEFAULT_SAMPLE_RATE);
         }
 
         Filter(uint8_t type,
@@ -55,7 +55,7 @@ namespace klangwellen {
                float   center_frequency,
                float   bandwidth,
                bool    use_fast_math = true,
-               float   sample_rate   = Klangwellen::DEFAULT_SAMPLE_RATE) : __USE_FAST_TRIG(use_fast_math) {
+               float   sample_rate   = KlangWellen::DEFAULT_SAMPLE_RATE) : __USE_FAST_TRIG(use_fast_math) {
             set(type, dbGain, center_frequency, bandwidth, sample_rate);
         }
 
@@ -81,7 +81,7 @@ namespace klangwellen {
         }
 
         void process(float*         signal_buffer,
-                     const uint32_t length = Klangwellen::DEFAULT_AUDIOBLOCK_SIZE) {
+                     const uint32_t length = KlangWellen::DEFAULT_AUDIOBLOCK_SIZE) {
             for (uint32_t i = 0; i < length; i++) {
                 signal_buffer[i] = process(signal_buffer[i]);
             }
@@ -91,26 +91,26 @@ namespace klangwellen {
                  float   dbGain, /* gain of filter */
                  float   center_frequency,
                  float   bandwidth, /* bandwidth in octaves */
-                 float   sample_rate = Klangwellen::DEFAULT_SAMPLE_RATE) {
+                 float   sample_rate = KlangWellen::DEFAULT_SAMPLE_RATE) {
             // float A, omega, sn, cs, alpha, beta;
             float a0, a1, a2, b0, b1, b2;
 
-            const float A     = Klangwellen::pow(10, dbGain / 40.0f);
+            const float A     = KlangWellen::pow(10, dbGain / 40.0f);
             const float omega = (2.0 * FILTER_PI * center_frequency / sample_rate);
             float       sn;
             float       cs;
             float       alpha;
             float       beta;
             if (__USE_FAST_TRIG) {
-                sn    = Klangwellen::fast_sin(omega);
-                cs    = Klangwellen::fast_cos(omega);
-                alpha = sn * Klangwellen::fast_sinh(FILTER_LN2 / 2 * bandwidth * omega / sn);
-                beta  = Klangwellen::fast_sqrt(A + A);
+                sn    = KlangWellen::fast_sin(omega);
+                cs    = KlangWellen::fast_cos(omega);
+                alpha = sn * KlangWellen::fast_sinh(FILTER_LN2 / 2 * bandwidth * omega / sn);
+                beta  = KlangWellen::fast_sqrt(A + A);
             } else {
-                sn    = Klangwellen::sin(omega);
-                cs    = Klangwellen::cos(omega);
-                alpha = sn * Klangwellen::sinh(FILTER_LN2 / 2 * bandwidth * omega / sn);
-                beta  = Klangwellen::sqrt(A + A);
+                sn    = KlangWellen::sin(omega);
+                cs    = KlangWellen::cos(omega);
+                alpha = sn * KlangWellen::sinh(FILTER_LN2 / 2 * bandwidth * omega / sn);
+                beta  = KlangWellen::sqrt(A + A);
             }
             switch (type) {
                 case LPF:

@@ -1,7 +1,7 @@
 /*
-* Klangwellen
+* KlangWellen
  *
- * This file is part of the *Klangwellen* library (https://github.com/dennisppaul/klangwellen).
+ * This file is part of the *KlangWellen* library (https://github.com/dennisppaul/klangwellen).
  * Copyright (c) 2025 Dennis P Paul
  *
  * This library is free software: you can redistribute it and/or modify
@@ -29,13 +29,13 @@
 
 #pragma once
 
-#include "Klangwellen.h"
+#include "KlangWellen.h"
 
 namespace klangwellen {
     class OscillatorFunction {
     public:
-        explicit OscillatorFunction(const uint32_t sample_rate = Klangwellen::DEFAULT_SAMPLE_RATE) : mSamplingRate(sample_rate) {
-            mWaveform = Klangwellen::WAVEFORM_SINE;
+        explicit OscillatorFunction(const uint32_t sample_rate = KlangWellen::DEFAULT_SAMPLE_RATE) : mSamplingRate(sample_rate) {
+            mWaveform = KlangWellen::WAVEFORM_SINE;
             set_frequency(DEFAULT_FREQUENCY);
             set_amplitude(DEFAULT_AMPLITUDE);
         }
@@ -82,20 +82,20 @@ namespace klangwellen {
         float process() {
             double s;
             switch (mWaveform) {
-                case Klangwellen::WAVEFORM_SINE:
+                case KlangWellen::WAVEFORM_SINE:
                     s = process_sine();
                     break;
-                case Klangwellen::WAVEFORM_TRIANGLE:
+                case KlangWellen::WAVEFORM_TRIANGLE:
                     s = process_triangle();
                     break;
-                case Klangwellen::WAVEFORM_SAWTOOTH:
+                case KlangWellen::WAVEFORM_SAWTOOTH:
                     s = process_sawtooth();
                     break;
-                case Klangwellen::WAVEFORM_SQUARE:
+                case KlangWellen::WAVEFORM_SQUARE:
                     s = process_square();
                     break;
-                case Klangwellen::WAVEFORM_NOISE:
-                    s = Klangwellen::random();
+                case KlangWellen::WAVEFORM_NOISE:
+                    s = KlangWellen::random();
                     break;
                 default:
                     s = 0.0f;
@@ -126,7 +126,7 @@ namespace klangwellen {
         double process_sawtooth() {
             mPhase += mFrequency;
             mPhase = mod(mPhase, mSamplingRate);
-            return mPhase / (mSamplingRate / 2.0) + Klangwellen::SIGNAL_MIN;
+            return mPhase / (mSamplingRate / 2.0) + KlangWellen::SIGNAL_MIN;
         }
 
         double process_sine() {
@@ -140,7 +140,7 @@ namespace klangwellen {
         double process_square() {
             mPhase += mFrequency;
             mPhase = mod(mPhase, mSamplingRate);
-            return mPhase > (mSamplingRate / 2.0f) ? Klangwellen::SIGNAL_MAX : Klangwellen::SIGNAL_MIN;
+            return mPhase > (mSamplingRate / 2.0f) ? KlangWellen::SIGNAL_MAX : KlangWellen::SIGNAL_MIN;
         }
 
         double process_triangle() {

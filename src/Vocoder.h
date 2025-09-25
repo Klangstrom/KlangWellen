@@ -1,7 +1,7 @@
 /*
- * Klangwellen
+ * KlangWellen
  *
- * This file is part of the *Klangwellen* library (https://github.com/dennisppaul/klangwellen).
+ * This file is part of the *KlangWellen* library (https://github.com/dennisppaul/klangwellen).
  * Copyright (c) 2025 Dennis P Paul
  *
  * This library is free software: you can redistribute it and/or modify
@@ -34,7 +34,7 @@
 
 #include <stdint.h>
 
-#include "Klangwellen.h"
+#include "KlangWellen.h"
 
 namespace klangwellen {
     /**
@@ -128,7 +128,7 @@ namespace klangwellen {
          */
         Vocoder(uint8_t  pBands          = 24,
                 uint8_t  pFiltersPerBand = 4,
-                uint32_t pSampleRate     = Klangwellen::DEFAULT_SAMPLE_RATE) : fBands(pBands),
+                uint32_t pSampleRate     = KlangWellen::DEFAULT_SAMPLE_RATE) : fBands(pBands),
                                                                            fFiltersPerBand(pFiltersPerBand),
                                                                            fSampleRate(pSampleRate) {
             // if (pBands < 4 || pBands > VOCLIB_MAX_BANDS) {
@@ -176,7 +176,7 @@ namespace klangwellen {
         void process(float*         carrier_buffer,
                      float*         modulator_buffer,
                      float*         output_buffer,
-                     const uint32_t frames = Klangwellen::DEFAULT_AUDIOBLOCK_SIZE) {
+                     const uint32_t frames = KlangWellen::DEFAULT_AUDIOBLOCK_SIZE) {
             /* Both the carrier and the modulator have a single channel. */
             for (uint32_t i = 0; i < frames; ++i) {
                 float out = 0.0f;
@@ -202,7 +202,7 @@ namespace klangwellen {
                      float*         modulator_buffer,
                      float*         output_buffer_left,
                      float*         output_buffer_right,
-                     const uint32_t frames = Klangwellen::DEFAULT_SAMPLE_RATE) {
+                     const uint32_t frames = KlangWellen::DEFAULT_SAMPLE_RATE) {
             /* The carrier has two channels and the modulator has 1. */
             for (uint32_t i = 0; i < frames; i++) {
                 float out_left  = 0.0f;
@@ -393,19 +393,19 @@ namespace klangwellen {
             float a0, a1, a2, b0, b1, b2;
 
             /* setup variables. */
-            A     = Klangwellen::pow(10, dbGain / 40.0f);
+            A     = KlangWellen::pow(10, dbGain / 40.0f);
             omega = (2.0 * VOCLIB_M_PI * freq / srate);
 #define VOCODER__USE_FAST_TRIG
 #ifdef VOCODER__USE_FAST_TRIG
-            sn    = Klangwellen::fast_sin(omega);
-            cs    = Klangwellen::fast_cos(omega);
-            alpha = sn * Klangwellen::fast_sinh(VOCLIB_M_LN2 / 2 * bandwidth * omega / sn);
-            beta  = Klangwellen::fast_sqrt(A + A);
+            sn    = KlangWellen::fast_sin(omega);
+            cs    = KlangWellen::fast_cos(omega);
+            alpha = sn * KlangWellen::fast_sinh(VOCLIB_M_LN2 / 2 * bandwidth * omega / sn);
+            beta  = KlangWellen::fast_sqrt(A + A);
 #else
-            sn    = Klangwellen::sin(omega);
-            cs    = Klangwellen::cos(omega);
-            alpha = sn * Klangwellen::sinh(VOCLIB_M_LN2 / 2 * bandwidth * omega / sn);
-            beta  = Klangwellen::sqrt(A + A);
+            sn    = KlangWellen::sin(omega);
+            cs    = KlangWellen::cos(omega);
+            alpha = sn * KlangWellen::sinh(VOCLIB_M_LN2 / 2 * bandwidth * omega / sn);
+            beta  = KlangWellen::sqrt(A + A);
 #endif
             switch (type) {
                 case VOCLIB_LPF:
@@ -483,7 +483,7 @@ namespace klangwellen {
         }
 
         void envelope_configure(envelope& envelope, float time_in_seconds, float sample_rate) {
-            envelope.coef = (float) (Klangwellen::pow(0.01, 1.0 / (time_in_seconds * sample_rate)));
+            envelope.coef = (float) (KlangWellen::pow(0.01, 1.0 / (time_in_seconds * sample_rate)));
         }
 
         /* Reset the envelope history. */
@@ -496,7 +496,7 @@ namespace klangwellen {
 
         float envelope_tick(envelope& envelope, float sample) {
             const float coef = envelope.coef;
-            const float e00  = (1.0f - coef) * Klangwellen::abs(sample);
+            const float e00  = (1.0f - coef) * KlangWellen::abs(sample);
             const float e01  = coef * envelope.history[0];
             const float e10  = (1.0f - coef) * envelope.history[0];
             const float e11  = coef * envelope.history[1];
@@ -532,7 +532,7 @@ namespace klangwellen {
             if (maxfreq > 12000.0) {
                 maxfreq = 12000.0;
             }
-            step = Klangwellen::pow((maxfreq / minfreq), (1.0 / fBands));
+            step = KlangWellen::pow((maxfreq / minfreq), (1.0 / fBands));
 
             for (i = 0; i < fBands; ++i) {
                 float bandwidth, nextfreq;

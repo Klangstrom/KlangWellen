@@ -1,7 +1,7 @@
 /*
- * Klangwellen
+ * KlangWellen
  *
- * This file is part of the *Klangwellen* library (https://github.com/dennisppaul/klangwellen).
+ * This file is part of the *KlangWellen* library (https://github.com/dennisppaul/klangwellen).
  * Copyright (c) 2025 Dennis P Paul
  *
  * This library is free software: you can redistribute it and/or modify
@@ -34,7 +34,7 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#include "Klangwellen.h"
+#include "KlangWellen.h"
 #include "AudioSignal.h"
 
 namespace klangwellen {
@@ -49,7 +49,7 @@ namespace klangwellen {
          * @param sample_rate the sample rate in Hz.
          * @param decay_rate  the decay of the echo, a value between 0 and 1. 1 meaning no decay, 0 means immediate decay
          */
-        Delay(float echo_length = 0.5, float decay_rate = 0.75, float wet = 0.8, uint32_t sample_rate = Klangwellen::DEFAULT_SAMPLE_RATE) : fSampleRate(sample_rate) {
+        Delay(float echo_length = 0.5, float decay_rate = 0.75, float wet = 0.8, uint32_t sample_rate = KlangWellen::DEFAULT_SAMPLE_RATE) : fSampleRate(sample_rate) {
             set_decay_rate(decay_rate);
             set_echo_length(echo_length);
             set_wet(wet);
@@ -77,7 +77,7 @@ namespace klangwellen {
         }
 
         void set_wet(float wet) {
-            fWet = Klangwellen::clamp(wet, 0, 1);
+            fWet = KlangWellen::clamp(wet, 0, 1);
         }
 
         float get_wet() {
@@ -100,7 +100,7 @@ namespace klangwellen {
         }
 
         void process(float*         signal_buffer,
-                     const uint32_t length = Klangwellen::DEFAULT_AUDIOBLOCK_SIZE) {
+                     const uint32_t length = KlangWellen::DEFAULT_AUDIOBLOCK_SIZE) {
             for (uint32_t i = 0; i < length; i++) {
                 signal_buffer[i] = process(signal_buffer[i]);
             }

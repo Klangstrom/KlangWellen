@@ -1,7 +1,7 @@
 /*
- * Klangwellen
+ * KlangWellen
  *
- * This file is part of the *Klangwellen* library (https://github.com/dennisppaul/klangwellen).
+ * This file is part of the *KlangWellen* library (https://github.com/dennisppaul/klangwellen).
  * Copyright (c) 2025 Dennis P Paul
  *
  * This library is free software: you can redistribute it and/or modify
@@ -38,7 +38,7 @@
 
 #include <vector>
 
-#include "Klangwellen.h"
+#include "KlangWellen.h"
 
 namespace klangwellen {
     class SamplerListener {
@@ -58,13 +58,13 @@ namespace klangwellen {
         }
 
         explicit SamplerT(int32_t  buffer_length,
-                          uint32_t sample_rate = Klangwellen::DEFAULT_SAMPLE_RATE) : SamplerT(new BUFFER_TYPE[buffer_length], buffer_length, sample_rate) {
+                          uint32_t sample_rate = KlangWellen::DEFAULT_SAMPLE_RATE) : SamplerT(new BUFFER_TYPE[buffer_length], buffer_length, sample_rate) {
             fAllocatedBuffer = true;
         }
 
         SamplerT(BUFFER_TYPE*   buffer,
                  const int32_t  buffer_length,
-                 const uint32_t sample_rate = Klangwellen::DEFAULT_SAMPLE_RATE) : fSampleRate(sample_rate),
+                 const uint32_t sample_rate = KlangWellen::DEFAULT_SAMPLE_RATE) : fSampleRate(sample_rate),
                                                                                   fDirectionForward(true),
                                                                                   fInPoint(0),
                                                                                   fOutPoint(0),
@@ -129,7 +129,7 @@ namespace klangwellen {
         void set_speed(const float speed) {
             fSpeed            = speed;
             fDirectionForward = speed > 0;
-            set_frequency(Klangwellen::abs(speed) * fSampleRate / fBufferLength); /* aka `step_size = speed` */
+            set_frequency(KlangWellen::abs(speed) * fSampleRate / fBufferLength); /* aka `step_size = speed` */
         }
 
         void set_frequency(const float frequency) {
@@ -247,7 +247,7 @@ namespace klangwellen {
             return mSample;
         }
 
-        void process(float* signal_buffer, const uint32_t buffer_length = Klangwellen::DEFAULT_AUDIOBLOCK_SIZE) {
+        void process(float* signal_buffer, const uint32_t buffer_length = KlangWellen::DEFAULT_AUDIOBLOCK_SIZE) {
             for (uint16_t i = 0; i < buffer_length; i++) {
                 signal_buffer[i] = process();
             }
@@ -352,7 +352,7 @@ namespace klangwellen {
         }
 
         void set_loop_in(const int32_t loop_in_point) {
-            fLoopIn = Klangwellen::clamp(loop_in_point, NO_LOOP_POINT, fBufferLength - 1);
+            fLoopIn = KlangWellen::clamp(loop_in_point, NO_LOOP_POINT, fBufferLength - 1);
         }
 
         float get_loop_in_normalized() const {
@@ -371,7 +371,7 @@ namespace klangwellen {
         }
 
         void set_loop_out(const int32_t loop_out_point) {
-            fLoopOut = Klangwellen::clamp(loop_out_point, NO_LOOP_POINT, fBufferLength - 1);
+            fLoopOut = KlangWellen::clamp(loop_out_point, NO_LOOP_POINT, fBufferLength - 1);
         }
 
         float get_loop_out_normalized() const {
@@ -393,8 +393,8 @@ namespace klangwellen {
 
         void note_on(const uint8_t note, const uint8_t velocity) {
             fIsPlaying = true;
-            set_frequency(Klangwellen::midi_note_to_frequency(note));
-            set_amplitude(Klangwellen::clamp127(velocity) / 127.0f);
+            set_frequency(KlangWellen::midi_note_to_frequency(note));
+            set_amplitude(KlangWellen::clamp127(velocity) / 127.0f);
             note_on();
         }
 

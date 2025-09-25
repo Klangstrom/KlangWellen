@@ -1,7 +1,7 @@
 /*
- * Klangwellen
+ * KlangWellen
  *
- * This file is part of the *Klangwellen* library (https://github.com/dennisppaul/klangwellen).
+ * This file is part of the *KlangWellen* library (https://github.com/dennisppaul/klangwellen).
  * Copyright (c) 2025 Dennis P Paul
  *
  * This library is free software: you can redistribute it and/or modify
@@ -45,7 +45,7 @@ static constexpr float HALF_PI = M_PI / 2;
 #endif
 
 namespace klangwellen {
-    class Klangwellen {
+    class KlangWellen {
     public:
         static constexpr int      DEFAULT_AUDIOBLOCK_SIZE               = KLANGWELLEN_DEFAULT_AUDIOBLOCK_SIZE;
         static constexpr uint32_t DEFAULT_SAMPLE_RATE                   = KLANGWELLEN_DEFAULT_SAMPLE_RATE;
@@ -61,7 +61,7 @@ namespace klangwellen {
         static constexpr uint8_t  DEFAULT_BITS_PER_SAMPLE               = BITS_PER_SAMPLE_16;
         static constexpr float    DEFAULT_FILTER_BANDWIDTH              = 100.0f;
         static constexpr float    DEFAULT_FILTER_FREQUENCY              = 1000.0f;
-        static constexpr uint32_t DEFAULT_INTERPOLATE_AMP_FREQ_DURATION = 5.f / 1000.f * static_cast<float>(DEFAULT_SAMPLE_RATE); // Klangwellen::millis_to_samples(5);
+        static constexpr uint32_t DEFAULT_INTERPOLATE_AMP_FREQ_DURATION = 5.f / 1000.f * static_cast<float>(DEFAULT_SAMPLE_RATE); // KlangWellen::millis_to_samples(5);
         static constexpr int      DEFAULT_WAVETABLE_SIZE                = 512;
         static constexpr uint8_t  DISTORTION_HARD_CLIPPING              = 0;
         static constexpr uint8_t  DISTORTION_FOLDBACK                   = 1;

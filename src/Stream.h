@@ -1,7 +1,7 @@
 /*
- * Klangwellen
+ * KlangWellen
  *
- * This file is part of the *Klangwellen* library (https://github.com/dennisppaul/klangwellen).
+ * This file is part of the *KlangWellen* library (https://github.com/dennisppaul/klangwellen).
  * Copyright (c) 2025 Dennis P Paul
  *
  * This library is free software: you can redistribute it and/or modify
@@ -32,7 +32,7 @@
 #include <stdint.h>
 #include <iostream>
 
-#include "Klangwellen.h"
+#include "KlangWellen.h"
 
 namespace klangwellen {
     class StreamDataProvider {
@@ -50,7 +50,7 @@ namespace klangwellen {
                const uint32_t      stream_buffer_size,
                const uint8_t       stream_buffer_division      = 4,
                const uint8_t       stream_buffer_update_offset = 1,
-               const uint32_t      sample_rate                 = Klangwellen::DEFAULT_SAMPLE_RATE)
+               const uint32_t      sample_rate                 = KlangWellen::DEFAULT_SAMPLE_RATE)
             : fStreamDataProvider(stream_data_provider),
               fBufferLength(stream_buffer_size),
               fBuffer(new float[stream_buffer_size]),
@@ -135,7 +135,7 @@ namespace klangwellen {
             return fBufferIndex;
         }
 
-        void process(float* signal_buffer, const uint32_t buffer_length = Klangwellen::DEFAULT_AUDIOBLOCK_SIZE) {
+        void process(float* signal_buffer, const uint32_t buffer_length = KlangWellen::DEFAULT_AUDIOBLOCK_SIZE) {
             for (uint16_t i = 0; i < buffer_length; i++) {
                 signal_buffer[i] = process();
             }

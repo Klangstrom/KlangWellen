@@ -1,7 +1,7 @@
 /*
- * Klangwellen
+ * KlangWellen
  *
- * This file is part of the *Klangwellen* library (https://github.com/dennisppaul/klangwellen).
+ * This file is part of the *KlangWellen* library (https://github.com/dennisppaul/klangwellen).
  * Copyright (c) 2025 Dennis P Paul
  *
  * This library is free software: you can redistribute it and/or modify
@@ -33,7 +33,7 @@
 #include <cmath>
 #include <algorithm>
 
-#include "Klangwellen.h"
+#include "KlangWellen.h"
 
 /**
  * plays back a chunk of samples ( i.e arbitrary, single-cycle waveform like sine, triangle, saw or square waves ) at
@@ -48,7 +48,7 @@ namespace klangwellen {
 
         Wavetable(float* wavetable, const uint32_t wavetable_size, const uint32_t sampling_rate) : mWavetableSize(wavetable_size),
                                                                                                    mSamplingRate(sampling_rate),
-                                                                                                   fInterpolationType(Klangwellen::WAVESHAPE_INTERPOLATE_NONE) {
+                                                                                                   fInterpolationType(KlangWellen::WAVESHAPE_INTERPOLATE_NONE) {
             _wavetable                = wavetable;
             fDeleteWavetable          = false;
             mArrayPtr                 = 0;
@@ -69,16 +69,16 @@ namespace klangwellen {
 
         static void fill(float* wavetable, const uint32_t wavetable_size, const uint8_t waveform) {
             switch (waveform) {
-                case Klangwellen::WAVEFORM_SINE:
+                case KlangWellen::WAVEFORM_SINE:
                     sine(wavetable, wavetable_size);
                     break;
-                case Klangwellen::WAVEFORM_TRIANGLE:
+                case KlangWellen::WAVEFORM_TRIANGLE:
                     triangle(wavetable, wavetable_size);
                     break;
-                case Klangwellen::WAVEFORM_SQUARE:
+                case KlangWellen::WAVEFORM_SQUARE:
                     square(wavetable, wavetable_size);
                     break;
-                case Klangwellen::WAVEFORM_SAWTOOTH:
+                case KlangWellen::WAVEFORM_SAWTOOTH:
                     sawtooth(wavetable, wavetable_size, false);
                     break;
                 default:
@@ -288,10 +288,10 @@ namespace klangwellen {
             mSignal = next_sample();
 #else
             switch (fInterpolationType) {
-                case Klangwellen::WAVESHAPE_INTERPOLATE_LINEAR:
+                case KlangWellen::WAVESHAPE_INTERPOLATE_LINEAR:
                     mSignal = next_sample_interpolate_linear();
                     break;
-                case Klangwellen::WAVESHAPE_INTERPOLATE_CUBIC:
+                case KlangWellen::WAVESHAPE_INTERPOLATE_CUBIC:
                     mSignal = next_sample_interpolate_cubic();
                     break;
                 default:
@@ -337,7 +337,7 @@ namespace klangwellen {
         uint8_t                fInterpolationType;
 
         void advance_array_ptr() {
-            // mArrayPtr += mStepSize * (mEnableJitter ? (klangwellen::Klangwellen::random() * mJitterRange + 1.0f) : 1.0f);
+            // mArrayPtr += mStepSize * (mEnableJitter ? (klangwellen::KlangWellen::random() * mJitterRange + 1.0f) : 1.0f);
             // mArrayPtr += mStepSize;
             mArrayPtr += mStepSize;
             while (mArrayPtr >= mWavetableSize) {

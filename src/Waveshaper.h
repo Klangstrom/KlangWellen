@@ -1,7 +1,7 @@
 /*
- * Klangwellen
+ * KlangWellen
  *
- * This file is part of the *Klangwellen* library (https://github.com/dennisppaul/klangwellen).
+ * This file is part of the *KlangWellen* library (https://github.com/dennisppaul/klangwellen).
  * Copyright (c) 2025 Dennis P Paul
  *
  * This library is free software: you can redistribute it and/or modify
@@ -31,7 +31,7 @@
 
 #include <stdint.h>
 
-#include "Klangwellen.h"
+#include "KlangWellen.h"
 
 namespace klangwellen {
 
@@ -48,19 +48,19 @@ namespace klangwellen {
                        fOutputGain(1.0f),
                        fBias(0.0),
                        fType(ATAN),
-                       fOneOverAtanAmount(1.f / (Klangwellen::fast_atan(fAmount))),
-                       fOneOverTanhAmount(1.f / Klangwellen::fast_tanh(fAmount)) {
+                       fOneOverAtanAmount(1.f / (KlangWellen::fast_atan(fAmount))),
+                       fOneOverTanhAmount(1.f / KlangWellen::fast_tanh(fAmount)) {
         }
 
         void set_amount(const float amount) {
             // 0.0 means no effect
-            fAmount            = Klangwellen::max(amount, 1.0);
-            fOneOverAtanAmount = 1.0 / Klangwellen::fast_atan(fAmount);
-            fOneOverTanhAmount = 1.0 / Klangwellen::fast_tanh(fAmount);
+            fAmount            = KlangWellen::max(amount, 1.0);
+            fOneOverAtanAmount = 1.0 / KlangWellen::fast_atan(fAmount);
+            fOneOverTanhAmount = 1.0 / KlangWellen::fast_tanh(fAmount);
         }
 
         void set_bias(const float bias) {
-            fBias = Klangwellen::clamp(bias);
+            fBias = KlangWellen::clamp(bias);
         }
 
         void set_output_gain(const float gain) {
@@ -71,7 +71,7 @@ namespace klangwellen {
             fType = type;
         }
 
-        void process(float* signal_buffer, const uint32_t length = Klangwellen::DEFAULT_AUDIOBLOCK_SIZE) {
+        void process(float* signal_buffer, const uint32_t length = KlangWellen::DEFAULT_AUDIOBLOCK_SIZE) {
             switch (fType) {
                 case ATAN:
                     for (uint32_t i = 0; i < length; i++) {
@@ -127,15 +127,15 @@ namespace klangwellen {
         float   fOneOverTanhAmount;
 
         float ProcessHardClip(float signal_buffer) {
-            return fOutputGain * Klangwellen::clamp(fAmount * (signal_buffer + fBias));
+            return fOutputGain * KlangWellen::clamp(fAmount * (signal_buffer + fBias));
         }
 
         float ProcessTanh(float signal_buffer) {
-            return fOutputGain * Klangwellen::fast_tanh((signal_buffer + fBias) * fAmount) * fOneOverTanhAmount;
+            return fOutputGain * KlangWellen::fast_tanh((signal_buffer + fBias) * fAmount) * fOneOverTanhAmount;
         }
 
         float ProcessATan(float signal_buffer) {
-            return fOutputGain * Klangwellen::fast_atan((signal_buffer + fBias) * fAmount) * fOneOverAtanAmount;
+            return fOutputGain * KlangWellen::fast_atan((signal_buffer + fBias) * fAmount) * fOneOverAtanAmount;
         }
 
         float ProcessCubic(float signal_buffer) {
@@ -144,8 +144,8 @@ namespace klangwellen {
 
             float mSample = (signal_buffer + fBias) * fAmount;
 
-            if (Klangwellen::abs(mSample) > 1.f) {
-                mSample = Klangwellen::sign(mSample) * CubicMax;
+            if (KlangWellen::abs(mSample) > 1.f) {
+                mSample = KlangWellen::sign(mSample) * CubicMax;
             } else {
                 mSample = mSample - (mSample * mSample * mSample * OneThird);
             }
@@ -157,10 +157,10 @@ namespace klangwellen {
         float ProcessSin(float signal_buffer) {
             float mSample = (signal_buffer + fBias) * fAmount;
 
-            if (Klangwellen::abs(mSample) > HALF_PI) {
-                mSample = Klangwellen::sign(mSample);
+            if (KlangWellen::abs(mSample) > HALF_PI) {
+                mSample = KlangWellen::sign(mSample);
             } else {
-                mSample = Klangwellen::fast_sin3(mSample);
+                mSample = KlangWellen::fast_sin3(mSample);
             }
 
             mSample *= fOutputGain;

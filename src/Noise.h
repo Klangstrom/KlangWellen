@@ -1,7 +1,7 @@
 /*
-* Klangwellen
+* KlangWellen
  *
- * This file is part of the *Klangwellen* library (https://github.com/dennisppaul/klangwellen).
+ * This file is part of the *KlangWellen* library (https://github.com/dennisppaul/klangwellen).
  * Copyright (c) 2025 Dennis P Paul
  *
  * This library is free software: you can redistribute it and/or modify
@@ -38,7 +38,7 @@
 #include <algorithm>
 #include <random>
 
-#include "Klangwellen.h"
+#include "KlangWellen.h"
 
 namespace klangwellen {
     /**
@@ -55,7 +55,7 @@ namespace klangwellen {
     class WhiteNoiseFast {
     public:
         float process() {
-            return Klangwellen::random() * 2.0 - 1.0;
+            return KlangWellen::random() * 2.0 - 1.0;
         }
     };
 
@@ -334,8 +334,8 @@ namespace klangwellen {
                 float x2;
                 float w;
                 do {
-                    x1 = 2.0 * Klangwellen::random() - 1.0;
-                    x2 = 2.0 * Klangwellen::random() - 1.0;
+                    x1 = 2.0 * KlangWellen::random() - 1.0;
+                    x2 = 2.0 * KlangWellen::random() - 1.0;
                     w  = x1 * x1 + x2 * x2;
                 } while (w >= 1.0);
 
@@ -362,7 +362,7 @@ namespace klangwellen {
     public:
         Noise() {
             fAmplitude = 1.0f;
-            fType      = Klangwellen::NOISE_WHITE;
+            fType      = KlangWellen::NOISE_WHITE;
         }
 
         float get_amplitude() const {
@@ -384,22 +384,22 @@ namespace klangwellen {
         float process() {
             float mSignal;
             switch (fType) {
-                case Klangwellen::NOISE_WHITE_FAST:
+                case KlangWellen::NOISE_WHITE_FAST:
                     mSignal = getWhiteNoise();
                     break;
-                case Klangwellen::NOISE_GAUSSIAN_WHITE_FAST:
+                case KlangWellen::NOISE_GAUSSIAN_WHITE_FAST:
                     mSignal = getGaussianWhiteNoiseFast();
                     break;
-                case Klangwellen::NOISE_GAUSSIAN_WHITE:
+                case KlangWellen::NOISE_GAUSSIAN_WHITE:
                     mSignal = mGaussianWhiteNoise.process();
                     break;
-                case Klangwellen::NOISE_PINK:
+                case KlangWellen::NOISE_PINK:
                     mSignal = mPinkNoise.process();
                     break;
-                case Klangwellen::NOISE_SIMPLEX:
+                case KlangWellen::NOISE_SIMPLEX:
                     mSignal = mSimplexNoise.process();
                     break;
-                case Klangwellen::NOISE_WHITE:
+                case KlangWellen::NOISE_WHITE:
                 default:
                     mSignal = getWhiteNoise();
                     break;
@@ -420,7 +420,7 @@ namespace klangwellen {
         }
 
         static float getWhiteNoiseFast() {
-            return Klangwellen::random() * 2.0 - 1.0;
+            return KlangWellen::random() * 2.0 - 1.0;
         }
 
     private:

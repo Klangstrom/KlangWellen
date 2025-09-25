@@ -1,7 +1,7 @@
 /*
- * Klangwellen
+ * KlangWellen
  *
- * This file is part of the *Klangwellen* library (https://github.com/dennisppaul/klangwellen).
+ * This file is part of the *KlangWellen* library (https://github.com/dennisppaul/klangwellen).
  * Copyright (c) 2025 Dennis P Paul
  *
  * This library is free software: you can redistribute it and/or modify
@@ -32,14 +32,14 @@
 #include <iostream>
 #include <cmath>
 
-#include "Klangwellen.h"
+#include "KlangWellen.h"
 #include "AudioSignal.h"
 
 namespace klangwellen {
     class Resonator {
     public:
         Resonator()
-            : fFrequency(440.0f), fSampleRate(Klangwellen::DEFAULT_SAMPLE_RATE), fQFactor(1.0f) {
+            : fFrequency(440.0f), fSampleRate(KlangWellen::DEFAULT_SAMPLE_RATE), fQFactor(1.0f) {
             calculateCoefficients();
         }
 

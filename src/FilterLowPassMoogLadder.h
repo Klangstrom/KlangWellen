@@ -1,7 +1,7 @@
 /*
- * Klangwellen
+ * KlangWellen
  *
- * This file is part of the *Klangwellen* library (https://github.com/dennisppaul/klangwellen).
+ * This file is part of the *KlangWellen* library (https://github.com/dennisppaul/klangwellen).
  * Copyright (c) 2025 Dennis P Paul
  *
  * This library is free software: you can redistribute it and/or modify
@@ -33,7 +33,7 @@
 #include <algorithm>
 #include <cmath>
 
-#include "Klangwellen.h"
+#include "KlangWellen.h"
 
 /**
  * low-pass filter implementing the <em>Moog Ladder</em>.
@@ -59,7 +59,7 @@ namespace klangwellen {
         float       fTanhstg[3]{};
 
     public:
-        FilterLowPassMoogLadder() : FilterLowPassMoogLadder(Klangwellen::DEFAULT_SAMPLE_RATE) {}
+        FilterLowPassMoogLadder() : FilterLowPassMoogLadder(KlangWellen::DEFAULT_SAMPLE_RATE) {}
 
         explicit FilterLowPassMoogLadder(const float sample_rate) : fSampleRate(sample_rate), fOldAcr(0), fOldTune(0) {
             fResonance       = 0.4f;
