@@ -1,2 +1,4 @@
 .vscode
 test/klangwellen-to-wav.wav
+tools/compile-results.csv
+tools/compile-results.csv

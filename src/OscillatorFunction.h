@@ -75,7 +75,7 @@ namespace klangwellen {
         void set_frequency(const float pFrequency) {
             if (mFrequency != pFrequency) {
                 mFrequency = pFrequency;
-                mStepSize  = mFrequency * (TWO_PI) / mSamplingRate;
+                mStepSize  = mFrequency * (KW_TWO_PI) / mSamplingRate;
             }
         }
 
@@ -131,8 +131,8 @@ namespace klangwellen {
 
         double process_sine() {
             mPhase += mStepSize;
-            if (mPhase > TWO_PI) {
-                mPhase -= TWO_PI;
+            if (mPhase > KW_TWO_PI) {
+                mPhase -= KW_TWO_PI;
             }
             return sin(mPhase);
         }

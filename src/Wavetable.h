@@ -311,8 +311,8 @@ namespace klangwellen {
         }
 
     private:
-        static constexpr float PIf                 = (float) PI;
-        static constexpr float TWO_PIf             = (float) TWO_PI;
+        static constexpr float PIf                 = (float) KW_PI;
+        static constexpr float TWO_PIf             = (float) KW_TWO_PI;
         static constexpr float M_DEFAULT_AMPLITUDE = 0.75f;
         static constexpr float M_DEFAULT_FREQUENCY = 220.0f;
         float*                 _wavetable;

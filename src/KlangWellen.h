@@ -28,9 +28,9 @@
 #define M_PI 3.141592653589793238462643383279502884L
 #endif
 
-static constexpr float PI      = M_PI;
-static constexpr float TWO_PI  = M_PI * 2;
-static constexpr float HALF_PI = M_PI / 2;
+static constexpr float KW_PI      = M_PI;
+static constexpr float KW_TWO_PI  = M_PI * 2;
+static constexpr float KW_HALF_PI = M_PI / 2;
 
 #ifndef KLANGWELLEN_WAVETABLE_INTERPOLATE_SAMPLES
 #define KLANGWELLEN_WAVETABLE_INTERPOLATE_SAMPLES 1
@@ -359,8 +359,8 @@ namespace klangwellen {
         }
 #pragma GCC diagnostic pop
 
-        static constexpr float PIf     = (float) PI;
-        static constexpr float TWO_PIf = (float) TWO_PI;
+        static constexpr float PIf     = (float) KW_PI;
+        static constexpr float TWO_PIf = (float) KW_TWO_PI;
 
         static float fast_sin(float x) {
             if (x < -PIf) {
