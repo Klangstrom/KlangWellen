@@ -37,12 +37,12 @@ namespace klangwellen {
 
     class Waveshaper {
     public:
-        static const uint8_t SIN                  = 0;
-        static const uint8_t ATAN                 = 1;
-        static const uint8_t TAN_H                = 2;
-        static const uint8_t CUBIC                = 3;
-        static const uint8_t HARDCLIP             = 4;
-        static const uint8_t NUM_WAVESHAPER_TYPES = 5;
+        static constexpr uint8_t SIN                  = 0;
+        static constexpr uint8_t ATAN                 = 1;
+        static constexpr uint8_t TAN_H                = 2;
+        static constexpr uint8_t CUBIC                = 3;
+        static constexpr uint8_t HARDCLIP             = 4;
+        static constexpr uint8_t NUM_WAVESHAPER_TYPES = 5;
 
         Waveshaper() : fAmount(1.0),
                        fOutputGain(1.0f),
@@ -71,7 +71,7 @@ namespace klangwellen {
             fType = type;
         }
 
-        void process(float* signal_buffer, const uint32_t length) {
+        void process(float* signal_buffer, const uint32_t length) const {
             switch (fType) {
                 case ATAN:
                     for (uint32_t i = 0; i < length; i++) {
@@ -102,7 +102,7 @@ namespace klangwellen {
             }
         }
 
-        float process(float sample) {
+        float process(const float sample) const {
             switch (fType) {
                 case ATAN:
                     return ProcessATan(sample);
@@ -126,21 +126,21 @@ namespace klangwellen {
         float   fOneOverAtanAmount;
         float   fOneOverTanhAmount;
 
-        float ProcessHardClip(float signal_buffer) {
+        float ProcessHardClip(const float signal_buffer) const {
             return fOutputGain * KlangWellen::clamp(fAmount * (signal_buffer + fBias));
         }
 
-        float ProcessTanh(float signal_buffer) {
+        float ProcessTanh(const float signal_buffer) const {
             return fOutputGain * KlangWellen::fast_tanh((signal_buffer + fBias) * fAmount) * fOneOverTanhAmount;
         }
 
-        float ProcessATan(float signal_buffer) {
+        float ProcessATan(const float signal_buffer) const {
             return fOutputGain * KlangWellen::fast_atan((signal_buffer + fBias) * fAmount) * fOneOverAtanAmount;
         }
 
-        float ProcessCubic(float signal_buffer) {
-            static const float CubicMax = 2.f / 3.f;
-            static const float OneThird = 1.f / 3.f;
+        float ProcessCubic(const float signal_buffer) const {
+            static constexpr float CubicMax = 2.f / 3.f;
+            static constexpr float OneThird = 1.f / 3.f;
 
             float mSample = (signal_buffer + fBias) * fAmount;
 
@@ -154,10 +154,10 @@ namespace klangwellen {
             return mSample;
         }
 
-        float ProcessSin(float signal_buffer) {
+        float ProcessSin(const float signal_buffer) const {
             float mSample = (signal_buffer + fBias) * fAmount;
 
-            if (KlangWellen::abs(mSample) > HALF_PI) {
+            if (KlangWellen::abs(mSample) > KW_HALF_PI) {
                 mSample = KlangWellen::sign(mSample);
             } else {
                 mSample = KlangWellen::fast_sin3(mSample);
