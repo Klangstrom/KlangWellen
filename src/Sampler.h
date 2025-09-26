@@ -43,7 +43,8 @@
 namespace klangwellen {
     class SamplerListener {
     public:
-        virtual void is_done() = 0;
+        virtual ~SamplerListener() = default;
+        virtual void is_done()     = 0;
     };
 
     /**
@@ -54,49 +55,47 @@ namespace klangwellen {
     public:
         static constexpr int8_t NO_LOOP_POINT = -1;
 
-        SamplerT() : SamplerT(0) {
-        }
+        explicit SamplerT(uint32_t sample_rate) : SamplerT(nullptr, 0, sample_rate) {}
 
-        explicit SamplerT(int32_t  buffer_length,
-                          uint32_t sample_rate) : SamplerT(new BUFFER_TYPE[buffer_length], buffer_length, sample_rate) {
-            fAllocatedBuffer = true;
+        explicit SamplerT(uint32_t sample_rate, int32_t buffer_length) : SamplerT(new BUFFER_TYPE[buffer_length], buffer_length, sample_rate) {
+            _allocated_buffer = true;
         }
 
         SamplerT(BUFFER_TYPE*   buffer,
                  const int32_t  buffer_length,
-                 const uint32_t sample_rate) : fSampleRate(sample_rate),
-                                                                                  fDirectionForward(true),
-                                                                                  fInPoint(0),
-                                                                                  fOutPoint(0),
-                                                                                  fSpeed(0) {
+                 const uint32_t sample_rate) : _sample_rate(sample_rate),
+                                               _direction_forward(true),
+                                               _in_point(0),
+                                               _out_point(0),
+                                               _speed(0) {
             set_buffer(buffer, buffer_length);
-            fBufferIndex        = 0;
-            fInterpolateSamples = false;
-            fEdgeFadePadding    = 0;
-            fIsPlaying          = false;
+            _buffer_index       = 0;
+            _interpolate_samples = false;
+            _edge_fade_padding    = 0;
+            _is_playing          = false;
             set_in(0);
-            set_out(fBufferLength - 1);
-            fFrequencyScale = 1.0f;
+            set_out(_buffer_length - 1);
+            _frequency_scale = 1.0f;
             set_speed(1.0f);
             set_amplitude(1.0f);
-            fIsRecording     = false;
-            fAllocatedBuffer = false;
+            _is_recording      = false;
+            _allocated_buffer = false;
         }
 
         ~SamplerT() {
-            if (fAllocatedBuffer) {
-                delete[] fBuffer;
+            if (_allocated_buffer) {
+                delete[] _buffer;
             }
         }
 
         void add_listener(SamplerListener* sampler_listener) {
-            fSamplerListeners.push_back(sampler_listener);
+            _sampler_listeners.push_back(sampler_listener);
         }
 
-        bool remove_listener(SamplerListener* sampler_listener) {
-            for (auto it = fSamplerListeners.begin(); it != fSamplerListeners.end(); ++it) {
+        bool remove_listener(const SamplerListener* sampler_listener) {
+            for (auto it = _sampler_listeners.begin(); it != _sampler_listeners.end(); ++it) {
                 if (*it == sampler_listener) {
-                    fSamplerListeners.erase(it);
+                    _sampler_listeners.erase(it);
                     return true;
                 }
             }
@@ -104,143 +103,146 @@ namespace klangwellen {
         }
 
         int32_t get_in() const {
-            return fInPoint;
+            return _in_point;
         }
 
         void set_in(int32_t in_point) {
-            if (in_point > fOutPoint) {
-                in_point = fOutPoint;
+            if (in_point > _out_point) {
+                in_point = _out_point;
             }
-            fInPoint = in_point;
+            _in_point = in_point;
         }
 
         int32_t get_out() const {
-            return fOutPoint;
+            return _out_point;
         }
 
         void set_out(const int32_t out_point) {
-            fOutPoint = out_point > last_index() ? last_index() : (out_point < fInPoint ? fInPoint : out_point);
+            _out_point = out_point > last_index() ? last_index() : (out_point < _in_point ? _in_point : out_point);
         }
 
         float get_speed() const {
-            return fSpeed;
+            return _speed;
         }
 
         void set_speed(const float speed) {
-            fSpeed            = speed;
-            fDirectionForward = speed > 0;
-            set_frequency(KlangWellen::abs(speed) * fSampleRate / fBufferLength); /* aka `step_size = speed` */
+            _speed             = speed;
+            _direction_forward = speed > 0;
+            set_frequency(KlangWellen::abs(speed) * _sample_rate / _buffer_length); /* aka `step_size = speed` */
         }
 
         void set_frequency(const float frequency) {
-            fFrequency = frequency;
-            fStepSize  = fFrequency / fFrequencyScale * (static_cast<float>(fBufferLength) / fSampleRate);
+            _frequency = frequency;
+            _step_size  = _frequency / _frequency_scale * (static_cast<float>(_buffer_length) / _sample_rate);
         }
 
         float get_frequency() const {
-            return fFrequency;
+            return _frequency;
         }
 
         void set_amplitude(const float amplitude) {
-            fAmplitude = amplitude;
+            _amplitude = amplitude;
         }
 
         float get_amplitude() const {
-            return fAmplitude;
+            return _amplitude;
         }
 
         BUFFER_TYPE* get_buffer() {
-            return fBuffer;
+            return _buffer;
         }
 
         int32_t get_buffer_length() const {
-            return fBufferLength;
+            return _buffer_length;
         }
 
         void set_buffer(BUFFER_TYPE* buffer, const int32_t buffer_length) {
-            fAllocatedBuffer = false; // TODO huuui, this is not nice and might cause some trouble somewhere
-            fBuffer          = buffer;
-            fBufferLength    = buffer_length;
+            if (_buffer != nullptr && _allocated_buffer) {
+                delete[] _buffer;
+            }
+            _allocated_buffer = false; // TODO huuui, this is not nice and might cause some trouble somewhere
+            _buffer           = buffer;
+            _buffer_length    = buffer_length;
             rewind();
-            set_speed(fSpeed);
+            set_speed(_speed);
             set_in(0);
-            set_out(fBufferLength - 1);
-            fLoopIn  = NO_LOOP_POINT;
-            fLoopOut = NO_LOOP_POINT;
+            set_out(_buffer_length - 1);
+            _loop_in  = NO_LOOP_POINT;
+            _loop_out = NO_LOOP_POINT;
         }
 
         void interpolate_samples(bool const interpolate_samples) {
-            fInterpolateSamples = interpolate_samples;
+            _interpolate_samples = interpolate_samples;
         }
 
         bool interpolate_samples() const {
-            return fInterpolateSamples;
+            return _interpolate_samples;
         }
 
         int32_t get_position() const {
-            return static_cast<int32_t>(fBufferIndex);
+            return static_cast<int32_t>(_buffer_index);
         }
 
         float get_position_normalized() const {
-            return fBufferLength > 0 ? fBufferIndex / fBufferLength : 0.0f;
+            return _buffer_length > 0 ? _buffer_index / _buffer_length : 0.0f;
         }
 
         float get_position_fractional_part() const {
-            return fBufferIndex - get_position();
+            return _buffer_index - get_position();
         }
 
         bool is_playing() const {
-            return fIsPlaying;
+            return _is_playing;
         }
 
         float process() {
-            if (fBufferLength == 0) {
+            if (_buffer_length == 0) {
                 notifyListeners(); // "buffer is empty"
                 return 0.0f;
             }
 
-            if (!fIsPlaying) {
+            if (!_is_playing) {
                 notifyListeners(); // "not playing"
                 return 0.0f;
             }
 
             validateInOutPoints();
 
-            fBufferIndex += fDirectionForward ? fStepSize : -fStepSize;
-            const int32_t mRoundedIndex = static_cast<int32_t>(fBufferIndex);
+            _buffer_index += _direction_forward ? _step_size : -_step_size;
+            const int32_t mRoundedIndex = static_cast<int32_t>(_buffer_index);
 
-            const float   mFrac         = fBufferIndex - mRoundedIndex;
+            const float   mFrac         = _buffer_index - mRoundedIndex;
             const int32_t mCurrentIndex = wrapIndex(mRoundedIndex);
-            fBufferIndex                = mCurrentIndex + mFrac;
+            _buffer_index               = mCurrentIndex + mFrac;
 
-            if (fDirectionForward ? (mCurrentIndex >= fOutPoint) : (mCurrentIndex <= fInPoint)) {
+            if (_direction_forward ? (mCurrentIndex >= _out_point) : (mCurrentIndex <= _in_point)) {
                 notifyListeners(); // "reached end"
                 return 0.0f;
             } else {
-                fIsFlaggedDone = false;
+                _is_flagged_done = false;
             }
 
-            float mSample = convert_sample(fBuffer[mCurrentIndex]);
+            float mSample = convert_sample(_buffer[mCurrentIndex]);
 
             /* interpolate */
-            if (fInterpolateSamples) {
+            if (_interpolate_samples) {
                 // TODO evaluate direction?
                 const int32_t mNextIndex  = wrapIndex(mCurrentIndex + 1);
-                const float   mNextSample = convert_sample(fBuffer[mNextIndex]);
+                const float   mNextSample = convert_sample(_buffer[mNextIndex]);
                 mSample                   = mSample * (1.0f - mFrac) + mNextSample * mFrac;
-                // mSample = interpolate_samples_linear(fBuffer, fBufferLength, fBufferIndex);
-                // mSample = interpolate_samples_cubic(fBuffer, fBufferLength, fBufferIndex);
+                // mSample = interpolate_samples_linear(_buffer, _buffer_length, _buffer_index);
+                // mSample = interpolate_samples_cubic(_buffer, _buffer_length, _buffer_index);
             }
-            mSample *= fAmplitude;
+            mSample *= _amplitude;
 
             /* fade edges */
-            if (fEdgeFadePadding > 0) {
-                const int32_t mRelativeIndex = fBufferLength - mCurrentIndex;
-                if (mCurrentIndex < fEdgeFadePadding) {
-                    const float mFadeInAmount = static_cast<float>(mCurrentIndex) / fEdgeFadePadding;
+            if (_edge_fade_padding > 0) {
+                const int32_t mRelativeIndex = _buffer_length - mCurrentIndex;
+                if (mCurrentIndex < _edge_fade_padding) {
+                    const float mFadeInAmount = static_cast<float>(mCurrentIndex) / _edge_fade_padding;
                     mSample *= mFadeInAmount;
-                } else if (mRelativeIndex < fEdgeFadePadding) {
-                    const float mFadeOutAmount = static_cast<float>(mRelativeIndex) / fEdgeFadePadding;
+                } else if (mRelativeIndex < _edge_fade_padding) {
+                    const float mFadeOutAmount = static_cast<float>(mRelativeIndex) / _edge_fade_padding;
                     mSample *= mFadeOutAmount;
                 }
             }
@@ -254,135 +256,135 @@ namespace klangwellen {
         }
 
         int32_t get_edge_fading() const {
-            return fEdgeFadePadding;
+            return _edge_fade_padding;
         }
 
         void set_edge_fading(int32_t edge_fade_padding) {
-            fEdgeFadePadding = edge_fade_padding;
+            _edge_fade_padding = edge_fade_padding;
         }
 
         void rewind() {
-            fBufferIndex = fDirectionForward ? fInPoint : fOutPoint;
+            _buffer_index = _direction_forward ? _in_point : _out_point;
         }
 
         void forward() {
-            fBufferIndex = fDirectionForward ? fOutPoint : fInPoint;
+            _buffer_index = _direction_forward ? _out_point : _in_point;
         }
 
         bool is_looping() const {
-            return fEvaluateLoop;
+            return _evaluate_loop;
         }
 
         void enable_loop(bool loop) {
-            fEvaluateLoop = loop;
+            _evaluate_loop = loop;
         }
 
         void set_looping() {
-            fEvaluateLoop = true;
-            fLoopIn       = 0;
-            fLoopOut      = fBufferLength > 0 ? (fBufferLength - 1) : 0;
+            _evaluate_loop = true;
+            _loop_in       = 0;
+            _loop_out      = _buffer_length > 0 ? (_buffer_length - 1) : 0;
         }
 
         void play() {
-            fIsPlaying = true;
-            fRecording.clear();
+            _is_playing = true;
+            _recording.clear();
         }
 
         void stop() {
-            fIsPlaying = false;
+            _is_playing = false;
         }
 
         void start_recording() {
-            fIsRecording = true;
+            _is_recording = true;
         }
 
         void resume_recording() {
-            fIsRecording = true;
+            _is_recording = true;
         }
 
         void pause_recording() {
-            fIsRecording = false;
+            _is_recording = false;
         }
 
         void delete_recording() {
-            fRecording.clear();
+            _recording.clear();
         }
 
         void record(float sample) {
-            if (fIsRecording) {
-                fRecording.push_back(sample);
+            if (_is_recording) {
+                _recording.push_back(sample);
             }
         }
 
-        void record(float* samples, int32_t num_samples) {
-            if (fIsRecording) {
+        void record(const float* samples, int32_t num_samples) {
+            if (_is_recording) {
                 for (int32_t i = 0; i < num_samples; i++) {
                     const float sample = samples[i];
-                    fRecording.push_back(sample);
+                    _recording.push_back(sample);
                 }
             }
         }
 
         bool is_recording() const {
-            return fIsRecording;
+            return _is_recording;
         }
 
         int get_length_recording() {
-            return fRecording.size();
+            return _recording.size();
         }
 
         uint32_t end_recording() {
-            fIsRecording                = false;
-            const int32_t mBufferLength = fRecording.size();
+            _is_recording                = false;
+            const int32_t mBufferLength = _recording.size();
             float*        mBuffer       = new float[mBufferLength];
             for (int32_t i = 0; i < mBufferLength; i++) {
-                mBuffer[i] = fRecording[i];
+                mBuffer[i] = _recording[i];
             }
-            fRecording.clear();
-            if (fAllocatedBuffer) {
-                delete[] fBuffer;
+            _recording.clear();
+            if (_allocated_buffer) {
+                delete[] _buffer;
             }
             set_buffer(mBuffer, mBufferLength);
-            fAllocatedBuffer = true;
+            _allocated_buffer = true;
             return mBufferLength;
         }
 
         int32_t get_loop_in() const {
-            return fLoopIn;
+            return _loop_in;
         }
 
         void set_loop_in(const int32_t loop_in_point) {
-            fLoopIn = KlangWellen::clamp(loop_in_point, NO_LOOP_POINT, fBufferLength - 1);
+            _loop_in = KlangWellen::clamp(loop_in_point, NO_LOOP_POINT, _buffer_length - 1);
         }
 
         float get_loop_in_normalized() const {
-            if (fBufferLength < 2) {
+            if (_buffer_length < 2) {
                 return 0.0f;
             }
-            return static_cast<float>(fLoopIn) / (fBufferLength - 1);
+            return static_cast<float>(_loop_in) / (_buffer_length - 1);
         }
 
         void set_loop_in_normalized(const float loop_in_point_normalized) {
-            set_loop_in(static_cast<int32_t>(loop_in_point_normalized * fBufferLength - 1));
+            set_loop_in(static_cast<int32_t>(loop_in_point_normalized * _buffer_length - 1));
         }
 
         int32_t get_loop_out() const {
-            return fLoopOut;
+            return _loop_out;
         }
 
         void set_loop_out(const int32_t loop_out_point) {
-            fLoopOut = KlangWellen::clamp(loop_out_point, NO_LOOP_POINT, fBufferLength - 1);
+            _loop_out = KlangWellen::clamp(loop_out_point, NO_LOOP_POINT, _buffer_length - 1);
         }
 
         float get_loop_out_normalized() const {
-            if (fBufferLength < 2) {
+            if (_buffer_length < 2) {
                 return 0.0f;
             }
-            return static_cast<float>(fLoopOut) / (fBufferLength - 1);
+            return static_cast<float>(_loop_out) / (_buffer_length - 1);
         }
 
         void set_loop_out_normalized(const float loop_out_point_normalized) {
-            set_loop_out(static_cast<int32_t>(loop_out_point_normalized * fBufferLength - 1));
+            set_loop_out(static_cast<int32_t>(loop_out_point_normalized * _buffer_length - 1));
         }
 
         void note_on() {
@@ -392,7 +394,7 @@ namespace klangwellen {
         }
 
         void note_on(const uint8_t note, const uint8_t velocity) {
-            fIsPlaying = true;
+            _is_playing = true;
             set_frequency(KlangWellen::midi_note_to_frequency(note));
             set_amplitude(KlangWellen::clamp127(velocity) / 127.0f);
             note_on();
@@ -409,112 +411,112 @@ namespace klangwellen {
          * @param tune_frequency the assumed frequency of the sampler buffer in Hz
          */
         void tune_frequency_to(const float tune_frequency) {
-            fFrequencyScale = tune_frequency;
+            _frequency_scale = tune_frequency;
         }
 
         void set_duration(const float seconds) {
-            if (fBufferLength == 0 || seconds == 0.0f) {
+            if (_buffer_length == 0 || seconds == 0.0f) {
                 return;
             }
-            const float mNormDurationSec = (static_cast<float>(fBufferLength) / static_cast<float>(fSampleRate));
+            const float mNormDurationSec = (static_cast<float>(_buffer_length) / static_cast<float>(_sample_rate));
             const float mSpeed           = mNormDurationSec / seconds;
             set_speed(mSpeed);
         }
 
         float get_duration() const {
-            if (fBufferLength == 0 || fSpeed == 0.0f) {
+            if (_buffer_length == 0 || _speed == 0.0f) {
                 return 0;
             }
-            const float mNormDurationSec = (static_cast<float>(fBufferLength) / static_cast<float>(fSampleRate));
-            return mNormDurationSec / fSpeed;
+            const float mNormDurationSec = (static_cast<float>(_buffer_length) / static_cast<float>(_sample_rate));
+            return mNormDurationSec / _speed;
         }
 
     private:
-        std::vector<SamplerListener*> fSamplerListeners;
-        std::vector<BUFFER_TYPE>      fRecording;
-        const uint32_t                fSampleRate;
-        float                         fAmplitude;
-        BUFFER_TYPE*                  fBuffer;
-        int32_t                       fBufferLength;
-        float                         fBufferIndex;
-        bool                          fDirectionForward;
-        int32_t                       fEdgeFadePadding;
-        bool                          fEvaluateLoop;
-        float                         fFrequency;
-        float                         fFrequencyScale;
-        int32_t                       fInPoint;
-        int32_t                       fOutPoint;
-        int32_t                       fLoopIn;
-        int32_t                       fLoopOut;
-        bool                          fInterpolateSamples;
-        bool                          fIsPlaying;
-        float                         fSpeed;
-        float                         fStepSize;
-        bool                          fIsFlaggedDone;
-        bool                          fIsRecording;
-        bool                          fAllocatedBuffer;
+        std::vector<SamplerListener*> _sampler_listeners;
+        std::vector<BUFFER_TYPE>      _recording;
+        const uint32_t                _sample_rate;
+        float                         _amplitude;
+        BUFFER_TYPE*                  _buffer;
+        int32_t                       _buffer_length;
+        float                         _buffer_index;
+        bool                          _direction_forward;
+        int32_t                       _edge_fade_padding;
+        bool                          _evaluate_loop;
+        float                         _frequency;
+        float                         _frequency_scale;
+        int32_t                       _in_point;
+        int32_t                       _out_point;
+        int32_t                       _loop_in;
+        int32_t                       _loop_out;
+        bool                          _interpolate_samples;
+        bool                          _is_playing;
+        float                         _speed;
+        float                         _step_size;
+        bool                          _is_flagged_done;
+        bool                          _is_recording;
+        bool                          _allocated_buffer;
 
         int32_t last_index() const {
-            return fBufferLength - 1;
+            return _buffer_length - 1;
         }
 
         void notifyListeners() {
-            if (!fIsFlaggedDone) {
-                for (SamplerListener* l: fSamplerListeners) {
+            if (!_is_flagged_done) {
+                for (SamplerListener* l: _sampler_listeners) {
                     l->is_done();
                 }
             }
-            fIsFlaggedDone = true;
+            _is_flagged_done = true;
         }
 
         void validateInOutPoints() {
-            if (fInPoint < 0) {
-                fInPoint = 0;
-            } else if (fInPoint > fBufferLength - 1) {
-                fInPoint = fBufferLength - 1;
+            if (_in_point < 0) {
+                _in_point = 0;
+            } else if (_in_point > _buffer_length - 1) {
+                _in_point = _buffer_length - 1;
             }
-            if (fOutPoint < 0) {
-                fOutPoint = 0;
-            } else if (fOutPoint > fBufferLength - 1) {
-                fOutPoint = fBufferLength - 1;
+            if (_out_point < 0) {
+                _out_point = 0;
+            } else if (_out_point > _buffer_length - 1) {
+                _out_point = _buffer_length - 1;
             }
-            if (fOutPoint < fInPoint) {
-                fOutPoint = fInPoint;
+            if (_out_point < _in_point) {
+                _out_point = _in_point;
             }
-            if (fLoopIn < fInPoint) {
-                fLoopIn = fInPoint;
+            if (_loop_in < _in_point) {
+                _loop_in = _in_point;
             }
-            if (fLoopOut > fOutPoint) {
-                fLoopOut = fOutPoint;
+            if (_loop_out > _out_point) {
+                _loop_out = _out_point;
             }
         }
 
         int32_t wrapIndex(int32_t i) const {
             /* check if in loop concept viable i.e loop in- and output points are set */
-            if (fEvaluateLoop) {
-                if (fLoopIn != NO_LOOP_POINT && fLoopOut != NO_LOOP_POINT) {
-                    if (fDirectionForward) {
-                        if (i > fLoopOut) {
-                            i = fLoopIn;
+            if (_evaluate_loop) {
+                if (_loop_in != NO_LOOP_POINT && _loop_out != NO_LOOP_POINT) {
+                    if (_direction_forward) {
+                        if (i > _loop_out) {
+                            i = _loop_in;
                         }
                     } else {
-                        if (i < fLoopIn) {
-                            i = fLoopOut;
+                        if (i < _loop_in) {
+                            i = _loop_out;
                         }
                     }
                 }
             }
 
             /* check if within bounds */
-            if (i > fOutPoint) {
-                i = fOutPoint;
-            } else if (i < fInPoint) {
-                i = fInPoint;
+            if (i > _out_point) {
+                i = _out_point;
+            } else if (i < _in_point) {
+                i = _in_point;
             }
             return i;
         }
 
-        float convert_sample(const BUFFER_TYPE pRawSample) {
+        static float convert_sample(const BUFFER_TYPE pRawSample) {
             return pRawSample;
         }
     };

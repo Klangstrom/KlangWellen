@@ -1,62 +1,27 @@
-// TODO add Sampler
-// TODO simplifiy
-
-/**
- * this example demonstrates load and play a WAV file from external memory.
- */
-
 #include "Arduino.h"
 #include "System.h"
 #include "Console.h"
 #include "AudioDevice.h"
 #include "SDCard.h"
+#include "Beat.h"
+
 #include "WAV.h"
-#include "Key.h"
+#include "Sampler.h"
 
-Key*   key_left              = nullptr;
-int    sample_buffer_size    = 0;
-float* sample_buffer         = nullptr;
-int    sample_buffer_counter = 0;
+using namespace klangwellen;
 
-void filter_wav_files(std::vector<std::string>& result_files) {
-    std::vector<std::string> files;
-    std::vector<std::string> directories;
-    sdcard_list("", files, directories);
-
-    for (std::string file: files) {
-        if (file.substr(file.find_last_of(".") + 1) == "WAV") {
-            // NOTE to also catch lower case add:
-            //      || file.substr(file.find_last_of(".") + 1) == "wav"
-            console_println("found WAV file: %s", file.c_str());
-            result_files.push_back(file);
-        } else {
-            console_println("not a WAV file: %s", file.c_str());
-        }
-    }
-}
-
-void open_file_and_load_header(const std::string& filename) {
-    if (wav_load_header(filename)) {
-        console_println("%i samples in WAV file", wav_num_sample_frames());
-        if (wav_is_open()) {
-            console_println("WAV file is now ready to be played");
-        }
-    } else {
-        console_println("failed to load WAV header");
-    }
-}
-
-void load_all_samples() {
-    sample_buffer_size = wav_num_sample_frames();
-    sample_buffer      = system_external_memory_allocate_float_array(sample_buffer_size);
-    wav_load_sample_frames(sample_buffer, WAV_ALL_SAMPLES);
-}
+Sampler sampler(48000);
+Beat    beat_timer;
 
 void setup() {
     system_init();
     console_init();
-    key_left = key_create(KEY_LEFT);
+    system_init_audiocodec();
     sdcard_init();
+
+    console_println("-------------");
+    console_println("18.LoadSample");
+    console_println("-------------");
 
     while (!sdcard_detected()) {
         console_println("SD card not detected");
@@ -66,46 +31,35 @@ void setup() {
     sdcard_status();
     sdcard_mount();
 
-    std::vector<std::string> wav_files;
-    filter_wav_files(wav_files);
+    const std::string filename = "LINSE.WAV"; // NOTE make sure this file exists on the SD card
+    wav_load_header(filename);
+    const int sample_buffer_size = wav_num_sample_frames();
+    float*    sample_buffer      = system_external_memory_allocate_float_array(sample_buffer_size);
+    wav_load_sample_frames(sample_buffer, WAV_ALL_SAMPLES);
 
-    if (wav_files.size() > 0) {
-        console_println("found %i WAV files", wav_files.size());
-        for (std::string file: wav_files) {
-            console_println(" - %s", file.c_str());
-        }
-        // console_println("loading first WAV file: %s", wav_files[0].c_str());
-        // load_header(wav_files[0]);
-        // open_file_and_load_header("LINSE.WAV");
-        open_file_and_load_header("TEILCHEN.WAV");
-        load_all_samples();
-    }
+    sampler.set_buffer(sample_buffer, sample_buffer_size);
+    sampler.play();
 
-    system_init_audiocodec();
+    beat_timer.init();
+    beat_timer.set_bpm(120 * 4);
+    beat_timer.start();
 }
 
 void loop() {}
 
-void audioblock(const AudioBlock* audio_block) {
-    if (sample_buffer == nullptr) {
-        return;
-    }
-    for (int i = 0; i < audio_block->block_size; ++i) {
-        float sample = 0.0f;
-        if (sample_buffer_counter < sample_buffer_size) {
-            sample_buffer_counter++;
-            sample = sample_buffer[sample_buffer_counter];
-        }
-        for (int c = 0; c < audio_block->output_channels; ++c) {
-            audio_block->output[c][i] = sample;
-        }
+void beat_event(const uint8_t beat_id, const uint16_t beat_counter) {
+    if (beat_counter % 16 == 0) {
+        sampler.set_speed(beat_counter / 16 % 4 * 0.25 + 0.25f);
+        sampler.rewind();
+        sampler.play();
     }
 }
 
-void key_event(const Key* key) {
-    if (key->device_id == key_left->device_id) {
-        if (key->pressed) {
-            sample_buffer_counter = 0;
-        }
+void audioblock(const AudioBlock* audio_block) {
+    for (int i = 0; i < audio_block->block_size; ++i) {
+        audio_block->output[0][i] = sampler.process();
+    }
+    if (audio_block->output_channels == 2) {
+        KlangWellen::copy(audio_block->output[0], audio_block->output[1], audio_block->block_size);
     }
 }

@@ -12,6 +12,7 @@ Wavetable wavetable(256, 48000);
 
 void setup() {
     system_init();
+    console_init();
     system_init_audiocodec();
 
     console_println("------------");

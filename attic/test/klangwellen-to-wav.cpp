@@ -23,8 +23,8 @@ int main() {
     std::cout << "SAMPLE_RATE .... : " << klangwellen::KlangWellen::DEFAULT_SAMPLE_RATE << std::endl;
     std::cout << "NUM OF SAMPLES ... : " << mNumSamples << std::endl;
 
-    klangwellen::Wavetable::sawtooth(fWavetable.get_wavetable(), fWavetable.get_wavetable_size(), 5);
-    fWavetable.set_frequency(27.5);
+    klangwellen::Wavetable::sawtooth(wavetable.get_wavetable(), wavetable.get_wavetable_size(), 5);
+    wavetable.set_frequency(27.5);
 
     bool mToggleADSR = false;
     fADSR.start();
@@ -33,12 +33,12 @@ int main() {
             mToggleADSR = !mToggleADSR;
             if (mToggleADSR) {
                 fADSR.start();
-                fWavetable.set_frequency(fWavetable.get_frequency() * 1.5);
+                wavetable.set_frequency(wavetable.get_frequency() * 1.5);
             } else {
                 fADSR.stop();
             }
         }
-        float mSample   = fWavetable.process();
+        float mSample   = wavetable.process();
         mSample         = fADSR.process(mSample);
         mSample         = fReverb.process(mSample);
         mAudioBuffer[i] = mSample;

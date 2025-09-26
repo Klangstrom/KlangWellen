@@ -4480,7 +4480,7 @@ namespace klangwellen {
         }
 
         void process(float* signal_buffer, const uint32_t buffer_length) {
-            const uint8_t* mBuffer       = (uint8_t*) GetBuffer();
+            const uint8_t* mBuffer       = reinterpret_cast<uint8_t*>(GetBuffer());
             const uint32_t mBufferLength = get_used_buffer_length();
             for (uint32_t i = 0; i < buffer_length; i += 2) {
                 float mSample = 0.0;

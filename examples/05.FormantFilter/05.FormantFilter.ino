@@ -44,12 +44,6 @@ void beat_event(const uint8_t beat_id, const uint16_t beat_counter) {
     wavetable.set_amplitude(((beat_counter / 2) % 13) / 13.0 * 0.1 + 0.05);
 }
 
-// void audioblock(float** input_signal, float** output_signal) {
-//     wavetable.process(output_signal[LEFT]);
-//     vowel_filter.process(output_signal[LEFT]);
-//     KlangWellen::copy(output_signal[LEFT], output_signal[RIGHT]);
-// }
-
 void audioblock(const AudioBlock* audio_block) {
     wavetable.process(audio_block->output[0], audio_block->block_size);
     vowel_filter.process(audio_block->output[0], audio_block->block_size);

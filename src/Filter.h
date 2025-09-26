@@ -37,29 +37,29 @@ namespace klangwellen {
     class Filter {
     public:
         /* filter types. */
-        static const uint8_t LPF              = 0; /* low pass filter */
-        static const uint8_t HPF              = 1; /* High pass filter */
-        static const uint8_t BPF              = 2; /* band pass filter */
-        static const uint8_t NOTCH            = 3; /* Notch Filter */
-        static const uint8_t PEQ              = 4; /* Peaking band EQ filter */
-        static const uint8_t LSH              = 5; /* Low shelf filter */
-        static const uint8_t HSH              = 6; /* High shelf filter */
-        static const uint8_t NUM_FILTER_TYPES = 7;
+        static constexpr uint8_t LPF              = 0; /* low pass filter */
+        static constexpr uint8_t HPF              = 1; /* High pass filter */
+        static constexpr uint8_t BPF              = 2; /* band pass filter */
+        static constexpr uint8_t NOTCH            = 3; /* Notch Filter */
+        static constexpr uint8_t PEQ              = 4; /* Peaking band EQ filter */
+        static constexpr uint8_t LSH              = 5; /* Low shelf filter */
+        static constexpr uint8_t HSH              = 6; /* High shelf filter */
+        static constexpr uint8_t NUM_FILTER_TYPES = 7;
 
-        Filter(float sample_rate, bool use_fast_math = true) : __USE_FAST_TRIG(use_fast_math) {
-            set(LPF, 0.0, 1000, 100, sample_rate);
+        explicit Filter(const float sample_rate, const bool use_fast_math = true) : _sample_rate(sample_rate), __USE_FAST_TRIG(use_fast_math) {
+            set(LPF, 0.0, 1000, 2);
         }
 
-        Filter(uint8_t type,
-               float   dbGain,
-               float   center_frequency,
-               float   bandwidth,
-               float   sample_rate,
-               bool    use_fast_math = true) : __USE_FAST_TRIG(use_fast_math) {
-            set(type, dbGain, center_frequency, bandwidth, sample_rate);
+        Filter(const uint8_t type,
+               const float   dbGain,
+               const float   center_frequency,
+               const float   bandwidth,
+               const float   sample_rate,
+               const bool    use_fast_math = true) : _sample_rate(sample_rate), __USE_FAST_TRIG(use_fast_math) {
+            set(type, dbGain, center_frequency, bandwidth);
         }
 
-        float process(float sample) {
+        float process(const float sample) {
             const float r0     = biquad_a0 * sample;
             const float r1     = biquad_a1 * biquad_x1;
             const float r2     = biquad_a2 * biquad_x2;
@@ -87,16 +87,14 @@ namespace klangwellen {
             }
         }
 
-        void set(uint8_t type,
-                 float   dbGain, /* gain of filter */
-                 float   center_frequency,
-                 float   bandwidth, /* bandwidth in octaves */
-                 float   sample_rate) {
-            // float A, omega, sn, cs, alpha, beta;
+        void set(const uint8_t type,
+                 const float   dbGain, /* gain of filter */
+                 const float   center_frequency,
+                 const float   bandwidth /* bandwidth in octaves */) {
             float a0, a1, a2, b0, b1, b2;
 
             const float A     = KlangWellen::pow(10, dbGain / 40.0f);
-            const float omega = (2.0 * FILTER_PI * center_frequency / sample_rate);
+            const float omega = (2.0 * FILTER_PI * center_frequency / _sample_rate);
             float       sn;
             float       cs;
             float       alpha;
@@ -104,7 +102,8 @@ namespace klangwellen {
             if (__USE_FAST_TRIG) {
                 sn    = KlangWellen::fast_sin(omega);
                 cs    = KlangWellen::fast_cos(omega);
-                alpha = sn * KlangWellen::fast_sinh(FILTER_LN2 / 2 * bandwidth * omega / sn);
+                // alpha = sn * KlangWellen::fast_sinh(FILTER_LN2 / 2 * bandwidth * omega / sn); // TODO fast_sinh causes problems
+                alpha = sn * KlangWellen::sinh(FILTER_LN2 / 2 * bandwidth * omega / sn);
                 beta  = KlangWellen::fast_sqrt(A + A);
             } else {
                 sn    = KlangWellen::sin(omega);
@@ -191,6 +190,7 @@ namespace klangwellen {
         static constexpr float FILTER_PI  = 3.14159265358979323846;
         float                  biquad_a0, biquad_a1, biquad_a2, biquad_a3, biquad_a4 = 0;
         float                  biquad_x1, biquad_x2, biquad_y1, biquad_y2 = 0;
+        const float            _sample_rate;
         const bool             __USE_FAST_TRIG;
     };
 

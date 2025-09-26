@@ -9,7 +9,7 @@
 
 using namespace klangwellen;
 
-Wavetable fWavetable(256, 48000);
+Wavetable wavetable(256, 48000);
 Envelope  fFrequencyEnvelope(48000);
 Envelope  fAmplitudeEnvelope(48000);
 Beat      beat_timer;
@@ -22,9 +22,9 @@ void setup() {
     console_println("16.Envelope");
     console_println("-----------");
 
-    fWavetable.set_waveform(KlangWellen::WAVEFORM_SAWTOOTH);
-    fWavetable.set_frequency(55.0);
-    fWavetable.set_amplitude(0.0);
+    wavetable.set_waveform(KlangWellen::WAVEFORM_SAWTOOTH);
+    wavetable.set_frequency(55.0);
+    wavetable.set_amplitude(0.0);
 
     fFrequencyEnvelope.add_stage(55.0, 0.5);
     fFrequencyEnvelope.add_stage(110.0);
@@ -52,9 +52,9 @@ void beat_event(const uint8_t beat_id, const uint16_t beat_counter) {
 
 void audioblock(const AudioBlock* audio_block) {
     for (uint16_t i = 0; i < audio_block->block_size; i++) {
-        fWavetable.set_frequency(fFrequencyEnvelope.process());
-        fWavetable.set_amplitude(fAmplitudeEnvelope.process());
-        audio_block->output[0][i] = fWavetable.process();
+        wavetable.set_frequency(fFrequencyEnvelope.process());
+        wavetable.set_amplitude(fAmplitudeEnvelope.process());
+        audio_block->output[0][i] = wavetable.process();
     }
     if (audio_block->output_channels == 2) {
         KlangWellen::copy(audio_block->output[0], audio_block->output[1], audio_block->block_size);
