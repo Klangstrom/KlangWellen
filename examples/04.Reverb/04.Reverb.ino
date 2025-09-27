@@ -7,7 +7,6 @@
 #include "ADSR.h"
 #include "Reverb.h"
 #include "Wavetable.h"
-#include "AudioSignal.h"
 
 using namespace klangwellen;
 

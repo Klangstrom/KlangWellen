@@ -112,6 +112,47 @@ namespace klangwellen {
             roomSize.set_now(0.5f);
             wet.set_now(0.3333f);
             IOTA = 0;
+
+            std::fill_n(fVec0, 2048, 0.0f);
+            std::fill_n(fVec1, 2048, 0.0f);
+            std::fill_n(fVec2, 2048, 0.0f);
+            std::fill_n(fVec3, 2048, 0.0f);
+            std::fill_n(fVec4, 2048, 0.0f);
+            std::fill_n(fVec5, 2048, 0.0f);
+            std::fill_n(fVec6, 2048, 0.0f);
+            std::fill_n(fVec7, 2048, 0.0f);
+            std::fill_n(fVec8, 1024, 0.0f);
+            std::fill_n(fVec9, 512, 0.0f);
+            std::fill_n(fVec10, 512, 0.0f);
+            std::fill_n(fVec11, 256, 0.0f);
+            std::fill_n(fVec12, 2048, 0.0f);
+            std::fill_n(fVec13, 2048, 0.0f);
+            std::fill_n(fVec14, 2048, 0.0f);
+            std::fill_n(fVec15, 2048, 0.0f);
+            std::fill_n(fVec16, 2048, 0.0f);
+            std::fill_n(fVec17, 2048, 0.0f);
+            std::fill_n(fVec18, 2048, 0.0f);
+            std::fill_n(fVec19, 2048, 0.0f);
+            std::fill_n(fVec20, 1024, 0.0f);
+            std::fill_n(fVec21, 512, 0.0f);
+            std::fill_n(fVec22, 512, 0.0f);
+            std::fill_n(fVec23, 256, 0.0f);
+            // zero scalar delay elements
+            fRec0_0 = fRec0_1 = fRec2_0 = fRec2_1 = fRec4_0 = fRec4_1 = 0.0f;
+            fRec6_0 = fRec6_1 = fRec8_0 = fRec8_1 = fRec9_0 = fRec9_1 = 0.0f;
+            fRec10_0 = fRec10_1 = fRec11_0 = fRec11_1 = fRec12_0 = fRec12_1 = 0.0f;
+            fRec13_0 = fRec13_1 = fRec14_0 = fRec14_1 = fRec15_0 = fRec15_1 = 0.0f;
+            fRec16_0 = fRec16_1 = fRec17_0 = fRec17_1 = fRec18_0 = fRec18_1 = 0.0f;
+            fRec19_0 = fRec19_1 = fRec20_0 = fRec20_1 = fRec21_0 = fRec21_1 = 0.0f;
+            fRec22_0 = fRec22_1 = fRec23_0 = fRec23_1 = fRec24_0 = fRec24_1 = 0.0f;
+            fRec26_0 = fRec26_1 = fRec28_0 = fRec28_1 = fRec30_0 = fRec30_1 = 0.0f;
+            fRec32_0 = fRec32_1 = fRec33_0 = fRec33_1 = fRec34_0 = fRec34_1 = 0.0f;
+            fRec35_0 = fRec35_1 = fRec36_0 = fRec36_1 = fRec37_0 = fRec37_1 = 0.0f;
+            fRec38_0 = fRec38_1 = fRec39_0 = fRec39_1 = fRec40_0 = fRec40_1 = 0.0f;
+            fRec41_0 = fRec41_1 = fRec42_0 = fRec42_1 = fRec43_0 = fRec43_1 = 0.0f;
+            fRec44_0 = fRec44_1 = fRec45_0 = fRec45_1 = fRec46_0 = fRec46_1 = 0.0f;
+            fRec47_0 = fRec47_1 = 0.0f;
+            fslider0 = fslider1 = fslider2 = 0.0f;
         }
 
         void set_damp(float pDamp) {
