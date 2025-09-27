@@ -35,43 +35,43 @@
 
 namespace klangwellen {
     class Gain {
-    private:
-        float mGain;
-
     public:
-        Gain() : mGain(1.0f) {}
+        Gain() : _gain(1.0f) {}
 
-        float get_gain() {
-            return mGain;
+        float get_gain() const {
+            return _gain;
         }
 
         void set_gain(float pGain) {
-            mGain = pGain;
+            _gain = pGain;
         }
 
-        float process(float signal) {
-            return signal * mGain;
+        float process(float signal) const {
+            return signal * _gain;
         }
 
-        void process(AudioSignal& signal) {
-            signal.left *= mGain;
-            signal.right *= mGain;
+        void process(AudioSignal& signal) const {
+            signal.left *= _gain;
+            signal.right *= _gain;
         }
 
         void process(float*         signal_buffer_left,
                      float*         signal_buffer_right,
-                     const uint32_t buffer_length) {
+                     const uint32_t buffer_length) const {
             for (int i = 0; i < buffer_length; i++) {
-                signal_buffer_left[i] *= mGain;
-                signal_buffer_right[i] *= mGain;
+                signal_buffer_left[i] *= _gain;
+                signal_buffer_right[i] *= _gain;
             }
         }
 
         void process(float*         signal_buffer,
-                     const uint32_t buffer_length) {
+                     const uint32_t buffer_length) const {
             for (int i = 0; i < buffer_length; i++) {
-                signal_buffer[i] *= mGain;
+                signal_buffer[i] *= _gain;
             }
         }
+
+    private:
+        float _gain;
     };
 } // namespace klangwellen

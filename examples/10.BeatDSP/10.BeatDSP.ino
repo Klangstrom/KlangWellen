@@ -42,15 +42,15 @@ void setup() {
 void loop() {}
 
 void beat_event(const uint8_t beat_id, const uint16_t beat_counter) {
-    if (beat_counter % 2) {
+    if (beat_counter % 2 == 0) {
         adsr.start();
     } else {
         adsr.stop();
     }
 }
 
-void beat_dsp_callback(uint32_t beat_counter) {
-    if (beat_counter % 2) {
+void beat_dsp_callback(const uint32_t beat_counter) {
+    if (beat_counter % 2 == 0) {
         adsr_dsp.start();
     } else {
         adsr_dsp.stop();

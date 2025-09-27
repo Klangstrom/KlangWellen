@@ -32,9 +32,10 @@ void setup() {
 void loop() {}
 
 void beat_event(const uint8_t beat_id, const uint16_t beat_counter) {
-    if (beat_counter % 2) {
+    if (beat_counter % 4 == 0) {
         sampler.rewind();
         sampler.play();
+        console_println("beat: %i", beat_counter);
     } else {
         sampler.stop();
     }

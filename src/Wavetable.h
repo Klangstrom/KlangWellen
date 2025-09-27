@@ -85,34 +85,50 @@ namespace klangwellen {
             }
         }
 
-        static void pulse(float* wavetable, const uint32_t wavetable_size, const float pulse_width) {
-            const auto mThreshold = static_cast<uint32_t>(static_cast<float>(wavetable_size) * pulse_width);
-            for (uint32_t i = 0; i < wavetable_size; i++) {
-                if (i < mThreshold) {
-                    wavetable[i] = 1.0f;
-                } else {
-                    wavetable[i] = -1.0f;
+        static void fill(float* wavetable, const uint32_t wavetable_size, const uint8_t waveform, const uint8_t harmonics) {
+            switch (waveform) {
+                case KlangWellen::WAVEFORM_TRIANGLE:
+                    triangle(wavetable, wavetable_size, harmonics);
+                    break;
+                case KlangWellen::WAVEFORM_SAWTOOTH:
+                    sawtooth(wavetable, wavetable_size, harmonics);
+                    break;
+                case KlangWellen::WAVEFORM_SQUARE:
+                    square(wavetable, wavetable_size, harmonics);
+                    break;
+                default:
+                    sine(wavetable, wavetable_size);
+            }
+        }
+
+        static void normalise_table(float* pWavetable, const uint32_t wavetable_size) {
+            int   n;
+            float _max = 0.f;
+            for (n = 0; n < wavetable_size; n++) {
+                _max = fmax(pWavetable[n], _max);
+            }
+            if (_max > 0) {
+                for (n = 0; n < wavetable_size; n++) {
+                    pWavetable[n] /= _max;
                 }
             }
         }
 
-        static void sawtooth(float* wavetable, const uint32_t wavetable_size, const bool is_ramp_up = true) {
-            const float mSign = is_ramp_up ? -1.0f : 1.0f;
-            for (uint32_t i = 0; i < wavetable_size; i++) {
-                wavetable[i] = mSign * (2.0f * (static_cast<float>(i) / static_cast<float>(wavetable_size - 1)) - 1.0f);
+        static void fourier_table(float* wavetable, const uint32_t wavetable_size, const int harmonics, const float* amps, float phase) {
+            phase *= static_cast<float>(KW_PI) * 2;
+            for (int i = 0; i < harmonics; i++) {
+                for (int n = 0; n < wavetable_size; n++) {
+                    const float  a = amps[i];
+                    const double w = (i + 1) * (n * 2 * KW_PI / wavetable_size);
+                    wavetable[n] += static_cast<float>(a * cos(w + phase));
+                }
             }
+            normalise_table(wavetable, wavetable_size);
         }
 
         static void sine(float* wavetable, const uint32_t wavetable_size) {
             for (uint32_t i = 0; i < wavetable_size; i++) {
                 wavetable[i] = sin(2.0f * PIf * (static_cast<float>(i) / static_cast<float>(wavetable_size)));
-            }
-        }
-
-        static void square(float* wavetable, const uint32_t wavetable_size) {
-            for (uint32_t i = 0; i < wavetable_size / 2; i++) {
-                wavetable[i]                      = 1.0f;
-                wavetable[i + wavetable_size / 2] = -1.0f;
             }
         }
 
@@ -128,8 +144,64 @@ namespace klangwellen {
             }
         }
 
+        static void triangle(float* wavetable, const uint32_t wavetable_size, const int harmonics) {
+            std::fill_n(wavetable, wavetable_size, 0.0f);
+            std::vector amps(harmonics, 0.0f);
+            for (int i = 0; i < harmonics; i += 2) {
+                amps[i] = 1.f / ((i + 1) * (i + 1));
+            }
+            fourier_table(wavetable, wavetable_size, harmonics, amps.data(), 0.0f);
+        }
+
+        static void sawtooth(float* wavetable, const uint32_t wavetable_size, const bool is_ramp_up) {
+            const float mSign = is_ramp_up ? -1.0f : 1.0f;
+            for (uint32_t i = 0; i < wavetable_size; i++) {
+                wavetable[i] = mSign * (2.0f * (static_cast<float>(i) / static_cast<float>(wavetable_size - 1)) - 1.0f);
+            }
+        }
+
+        static void sawtooth(float* wavetable, const uint32_t wavetable_size, const int harmonics) {
+            std::fill_n(wavetable, wavetable_size, 0.0f);
+            std::vector amps(harmonics, 0.0f);
+            for (int i = 0; i < harmonics; i++) {
+                amps[i] = 1.f / (i + 1);
+            }
+            fourier_table(wavetable, wavetable_size, harmonics, amps.data(), -0.25f);
+        }
+
+        static void square(float* wavetable, const uint32_t wavetable_size) {
+            for (uint32_t i = 0; i < wavetable_size / 2; i++) {
+                wavetable[i]                      = 1.0f;
+                wavetable[i + wavetable_size / 2] = -1.0f;
+            }
+        }
+
+        static void square(float* wavetable, const uint32_t wavetable_size, const int harmonics) {
+            std::fill_n(wavetable, wavetable_size, 0.0f);
+            std::vector amps(harmonics, 0.0f);
+            for (int i = 0; i < harmonics; i += 2) {
+                amps[i] = 1.f / (i + 1);
+            }
+            fourier_table(wavetable, wavetable_size, harmonics, amps.data(), -0.25f);
+        }
+
+        static void pulse(float* wavetable, const uint32_t wavetable_size, const float pulse_width) {
+            const auto mThreshold = static_cast<uint32_t>(static_cast<float>(wavetable_size) * pulse_width);
+            for (uint32_t i = 0; i < wavetable_size; i++) {
+                if (i < mThreshold) {
+                    wavetable[i] = 1.0f;
+                } else {
+                    wavetable[i] = -1.0f;
+                }
+            }
+        }
+
         void set_waveform(const uint8_t waveform) const {
             fill(_wavetable, mWavetableSize, waveform);
+        }
+
+        void set_waveform(const uint8_t waveform, const int harmonics) const {
+            fill(_wavetable, mWavetableSize, waveform, harmonics);
         }
 
         float get_frequency() const {

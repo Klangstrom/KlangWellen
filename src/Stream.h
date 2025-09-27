@@ -32,14 +32,12 @@
 #include <stdint.h>
 #include <iostream>
 
-#include "KlangWellen.h"
-
 namespace klangwellen {
     class StreamDataProvider {
     public:
         virtual ~StreamDataProvider() = default;
 
-        virtual void fill_buffer(float* buffer, uint32_t length) {
+        virtual void fill_buffer(float* buffer, const uint32_t length) {
             std::fill_n(buffer, length, 0.0f);
         }
     };
@@ -47,92 +45,92 @@ namespace klangwellen {
     class Stream final {
     public:
         Stream(StreamDataProvider* stream_data_provider,
+               const uint32_t      sample_rate,
                const uint32_t      stream_buffer_size,
                const uint8_t       stream_buffer_division      = 4,
-               const uint8_t       stream_buffer_update_offset = 1,
-               const uint32_t      sample_rate                )
-            : fStreamDataProvider(stream_data_provider),
-              fBufferLength(stream_buffer_size),
-              fBuffer(new float[stream_buffer_size]),
-              fBufferDivision(stream_buffer_division),
-              fBufferSegmentOffset(stream_buffer_update_offset % stream_buffer_division),
-              fSampleRate(sample_rate),
-              fAmplitude(1.0f),
-              fStepSize(1.0f),
-              fInterpolateSamples(true),
-              fBufferIndex(0.0f),
-              fBufferIndexPrev(0.0f),
-              fCompleteEvent(NO_EVENT) {
-            fStreamDataProvider->fill_buffer(fBuffer, fBufferLength);
+               const uint8_t       stream_buffer_update_offset = 1)
+            : _stream_data_provider(stream_data_provider),
+              _buffer_length(stream_buffer_size),
+              _buffer(new float[stream_buffer_size]),
+              _buffer_division(stream_buffer_division),
+              _buffer_segment_offset(stream_buffer_update_offset % stream_buffer_division),
+              _sample_rate(sample_rate),
+              _amplitude(1.0f),
+              _step_size(1.0f),
+              _interpolate_samples(true),
+              _buffer_index(0.0f),
+              _buffer_index_prev(0.0f),
+              _complete_event(NO_EVENT) {
+            _stream_data_provider->fill_buffer(_buffer, _buffer_length);
         }
 
         ~Stream() {
-            delete[] fBuffer;
+            delete[] _buffer;
         }
 
         float process() {
-            fBufferIndex += fStepSize;
-            const int32_t mRoundedIndex = static_cast<int32_t>(fBufferIndex);
-            const float   mFrac         = fBufferIndex - mRoundedIndex;
+            _buffer_index += _step_size;
+            const int32_t mRoundedIndex = static_cast<int32_t>(_buffer_index);
+            const float   mFrac         = _buffer_index - mRoundedIndex;
             const int32_t mCurrentIndex = wrapIndex(mRoundedIndex);
-            fBufferIndex                = mCurrentIndex + mFrac;
+            _buffer_index               = mCurrentIndex + mFrac;
 
-            float mSample = convert_sample(fBuffer[mCurrentIndex]);
+            float mSample = convert_sample(_buffer[mCurrentIndex]);
 
             /* linear interpolation */
-            if (fInterpolateSamples) {
+            if (_interpolate_samples) {
                 const int32_t mNextIndex  = wrapIndex(mCurrentIndex + 1);
-                const float   mNextSample = convert_sample(fBuffer[mNextIndex]);
+                const float   mNextSample = convert_sample(_buffer[mNextIndex]);
                 const float   a           = mSample * (1.0f - mFrac);
                 const float   b           = mNextSample * mFrac;
                 mSample                   = a + b;
             }
-            mSample *= fAmplitude;
+            mSample *= _amplitude;
 
             /* load next block */
-            int8_t mCompleteEvent = checkCompleteEvent(fBufferDivision);
+            int8_t mCompleteEvent = checkCompleteEvent(_buffer_division);
             if (mCompleteEvent > NO_EVENT) {
-                fCompleteEvent = mCompleteEvent;
-                mCompleteEvent -= fBufferSegmentOffset;
-                mCompleteEvent += fBufferDivision;
-                mCompleteEvent %= fBufferDivision;
-                replace_segment(fBufferDivision, mCompleteEvent);
+                _complete_event = mCompleteEvent;
+                mCompleteEvent -= _buffer_segment_offset;
+                mCompleteEvent += _buffer_division;
+                mCompleteEvent %= _buffer_division;
+                replace_segment(_buffer_division, mCompleteEvent);
             }
-            fBufferIndexPrev = fBufferIndex;
+            _buffer_index_prev = _buffer_index;
 
             return mSample;
         }
 
-        void replace_segment(const uint32_t numberOfSegments, const uint32_t segmentIndex) const {
-            if (segmentIndex >= numberOfSegments) {
+        void replace_segment(const uint32_t number_of_segments, const uint32_t segment_index) const {
+            if (segment_index >= number_of_segments) {
                 std::cerr << "Segment index out of range" << std::endl;
                 return;
             }
 
-            const uint32_t lengthOfSegment = fBufferLength / numberOfSegments;
-            float*         startOfSegment  = fBuffer + (segmentIndex * lengthOfSegment);
+            const uint32_t lengthOfSegment = _buffer_length / number_of_segments;
+            float*         startOfSegment  = _buffer + (segment_index * lengthOfSegment);
 
-            fStreamDataProvider->fill_buffer(startOfSegment, lengthOfSegment);
+            _stream_data_provider->fill_buffer(startOfSegment, lengthOfSegment);
         }
 
         float* get_buffer() const {
-            return fBuffer;
+            return _buffer;
         }
 
         int8_t get_sector() const {
-            return fCompleteEvent;
+            return _complete_event;
         }
 
         uint8_t num_sectors() const {
-            return fBufferDivision;
+            return _buffer_division;
         }
 
         uint32_t get_buffer_length() const {
-            return fBufferLength;
+            return _buffer_length;
         }
 
         float get_current_buffer_position() const {
-            return fBufferIndex;
+            return _buffer_index;
         }
 
         void process(float* signal_buffer, const uint32_t buffer_length) {
@@ -142,43 +140,42 @@ namespace klangwellen {
         }
 
         void interpolate_samples(bool const interpolate_samples) {
-            fInterpolateSamples = interpolate_samples;
+            _interpolate_samples = interpolate_samples;
         }
 
         bool interpolate_samples() const {
-            return fInterpolateSamples;
+            return _interpolate_samples;
         }
 
         float get_speed() const {
-            return fStepSize;
+            return _step_size;
         }
 
         void set_speed(const float speed) {
-            fStepSize = speed;
+            _step_size = speed;
         }
 
     private:
         static constexpr int8_t NO_EVENT = -1;
 
-        StreamDataProvider* fStreamDataProvider;
-
-        uint32_t      fBufferLength;
-        float*        fBuffer;
-        const uint8_t fBufferDivision;
-        const uint8_t fBufferSegmentOffset;
-        float         fSampleRate;
-        float         fAmplitude;
-        float         fStepSize;
-        bool          fInterpolateSamples;
-        float         fBufferIndex;
-        float         fBufferIndexPrev;
-        int8_t        fCompleteEvent;
+        StreamDataProvider* _stream_data_provider;
+        uint32_t            _buffer_length;
+        float*              _buffer;
+        const uint8_t       _buffer_division;
+        const uint8_t       _buffer_segment_offset;
+        float               _sample_rate;
+        float               _amplitude;
+        float               _step_size;
+        bool                _interpolate_samples;
+        float               _buffer_index;
+        float               _buffer_index_prev;
+        int8_t              _complete_event;
 
         int32_t wrapIndex(int32_t i) const {
             if (i < 0) {
-                i += fBufferLength;
-            } else if (i >= fBufferLength) {
-                i -= fBufferLength;
+                i += _buffer_length;
+            } else if (i >= _buffer_length) {
+                i -= _buffer_length;
             }
             return i;
         }
@@ -189,8 +186,8 @@ namespace klangwellen {
 
         int8_t checkCompleteEvent(const uint8_t num_events) const {
             for (int i = 0; i < num_events; ++i) {
-                const float mBorder = fBufferLength * i / static_cast<float>(fBufferDivision);
-                if (crossedBorder(fBufferIndexPrev, fBufferIndex, mBorder)) {
+                const float mBorder = _buffer_length * i / static_cast<float>(_buffer_division);
+                if (crossedBorder(_buffer_index_prev, _buffer_index, mBorder)) {
                     return i;
                 }
             }
