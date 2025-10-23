@@ -31,16 +31,12 @@
 
 #include <stdint.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
-#include <iostream>
 #include <sstream>
 #include <string>
 
 #include "KlangWellen.h"
-
-using namespace std;
 
 namespace klangwellen {
     class SAM {
@@ -4427,7 +4423,7 @@ namespace klangwellen {
             }
         }
 
-        void speak(string pText, const bool pUsePhonemes = false) {
+        void speak(std::string pText, const bool pUsePhonemes = false) {
             char input[256];
             if (pUsePhonemes) {
                 pText.length() < 255 ? strcpy(input, pText.c_str()) : strncpy(input, pText.c_str(), 255);
@@ -4449,9 +4445,9 @@ namespace klangwellen {
         }
 
         void speak_ascii(const int pASCIIValue) {
-            stringstream ss;
+            std::stringstream ss;
             ss << static_cast<char>(pASCIIValue);
-            string s;
+            std::string s;
             ss >> s;
             speak(s);
         }
@@ -4464,7 +4460,7 @@ namespace klangwellen {
         /**
          * renders text into buffer but does not play it immediately
          */
-        void speak_to_buffer(string pText, const bool pUsePhonemes = false) {
+        void speak_to_buffer(std::string pText, const bool pUsePhonemes = false) {
             speak(pText, pUsePhonemes);
             _done_speaking = true;
             _counter       = get_used_buffer_length() - 1;
